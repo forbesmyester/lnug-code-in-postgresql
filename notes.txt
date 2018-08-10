@@ -1,0 +1,32 @@
+# Comparing Node code to PostgreSQL code
+
+## Prepare the database
+
+First configure environmental variables to allow easy PostgreSQL interaction
+
+```sh
+export PGUSER=postgres PGPASSWORD=postgres PGDATABASE=postgres PGHOST=127.0.0.1
+```
+
+Then import the [Ergast](http://ergast.com/) database.
+```sh
+wget http://ergast.com/downloads/f1db_ansi.sql.gz
+cat  f1db_ansi.sql.gz | gzip -d | sed 's/int(..)/int/' | sed 's/ \+AUTO_INCREMENT//' |  sed "s/\\\'/\'\'/g" |  sed 's/UNIQUE KEY \"\(\w\+\)\"/UNIQUE /' | sed 's/^ *KEY .*(\"\(.*\)\")/CHECK ("\1" > 0)/' | sed 's/ date NOT NULL DEFAULT .0000.*,/ date,/'| psql
+```
+
+## Prepare NodeJS Code
+
+
+# mkdir pg_dump ; cd pg_dump
+# unzip ../dvdrental.zip
+# echo create database dvdrental | psql
+# pg_restore -U postgres -d dvdrental dvdrental.tar
+# 
+# select * from city
+# 
+# select
+#     city."city"
+#     count(*)
+# from city
+# inner join address on address.city_id = city.city_id
+# inner join store on store.address_id = address.address_id

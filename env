@@ -1,0 +1,7 @@
+#!/bin/bash
+
+export PGUSER=postgres
+export PGPASSWORD=postgres
+export PGHOST=127.0.0.1
+export PGDATABASE=postgres
+export DATABASE_URL="postgres://$PGUSER@$PGHOST/$PGDATABASE"
