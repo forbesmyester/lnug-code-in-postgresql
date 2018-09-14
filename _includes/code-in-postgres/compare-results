@@ -1,18 +1,24 @@
 #!/bin/bash
 
-UUID=$(uuidgen)
+set -euo pipefail
+IFS=$'\n\t'
+
+UUID=$(uuidgen | sed 's/\-//g')
 SQL_FILE="$(echo "$1" | sed 's/\.[a-z]*//').sql"
 JS_FILE="$(echo "$1" | sed 's/\.[a-z]*//').js"
 SQL_TMP=$(mktemp)
 JS_TMP=$(mktemp)
-echo $JS_FILE $SQL_FILE
+DIRNAME=$(dirname $0)
 
-echo "select(jsonb_agg(t)) from ( $(cat $SQL_FILE) ) t" | psql -t -z | jq -S -c '.[]' > "$SQL_TMP"
+$DIRNAME/get-postgres-result $SQL_FILE > "$SQL_TMP"
 node "$JS_FILE" | jq -c -S . > "$JS_TMP"
+set +e
 diff "$JS_TMP" "$SQL_TMP"
 E=$?
+set -e
 if [ $E -ne 0 ]; then
     echo "Difference detected..."
     echo "Files: $JS_TMP $SQL_TMP"
 fi
 exit $E
+

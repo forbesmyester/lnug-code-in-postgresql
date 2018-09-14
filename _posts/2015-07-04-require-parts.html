@@ -1,0 +1,7 @@
+---
+layout: post
+title: Require Parts
+tag: 
+---
+
+<p>Noticed this when requiring <a href="http://ramdajs.com/">Ramda</a>:</p><pre><code>[BABEL] Note: The code generator has deoptimised the styling of &quot;/home/fozz/Projects/siac-ui/node_modules/ramda/dist/ramda.js&quot; as it exceeds the max of &quot;100KB&quot;.</code></pre><p>Now I love Ramda, you should read about, it's awesome, but I am only actually using a few functions from it in this project and this is overkill... So instead I did:</p><pre><code>var R = { zipObj: require(&#39;ramda/src/zipObj.js&#39;) };</code></pre><p>which is all well and fine but I kept adding to this this and it became a bit of a pain...</p><pre><code>var R = {<br />    assocPath: require(&#39;ramda/src/assocPath.js&#39;),<br />    defaultTo: require(&#39;ramda/src/defaultTo.js&#39;),<br />    partition: require(&#39;ramda/src/partition.js&#39;),<br />    pipe: require(&#39;ramda/src/pipe.js&#39;),<br />    reduce: require(&#39;ramda/src/reduce.js&#39;)<br />};</code></pre><p>so I created <a href="https://github.com/forbesmyester/require-parts">this micro library</a>. It can be used like the following:</p><pre><code>var requireParts = require(&#39;require-parts&#39;);<br />var R = requireParts(&#39;ramda&#39;, &#39;src&#39;, [&#39;zipObj.js&#39;, &#39;min.js&#39;]);</code></pre><p>This works for modules installed with NPM, doesn't seem to work with Babel, but there is a <a href="https://github.com/forbesmyester/require-parts-babel">Babel Plugin</a> which does the same job.</p>

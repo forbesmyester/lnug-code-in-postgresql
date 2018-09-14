@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -euo pipefail
+IFS=$'\n\t'
+
+UUID=$(uuidgen | sed 's/\-//g')
+SQL_FILE=$1
+SQL="select(jsonb_agg(x$UUID)) from ( $(cat $SQL_FILE) ) x$UUID" 
+echo "$SQL" | psql -t -z | jq -S -c '.[]'

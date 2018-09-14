@@ -1,0 +1,49 @@
+<ul id="tabs">
+  <li class="active"><a href="#code-compare">Code Comparison</a></li>
+  <li><a href="#results">Results</a></li>
+</ul>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+function getElementsToShow(evt) {
+  return Array.from(document.querySelectorAll(
+    '.' + evt.target.href.replace(/.*#/, '')
+  ));
+}
+
+function showElement(el) { el.style.display = 'block'; }
+
+function hideElement(el) { el.style.display = 'none'; }
+
+function makeInactive(el) { el.classList.remove('active') }
+
+function makeActive(el) { el.classList.add('active') }
+
+Array.from(document.querySelectorAll('.tabbable')).map(hideElement);
+Array.from(document.querySelectorAll('.code-compare')).map(showElement);
+
+Array.from(document.querySelectorAll('#tabs a')).map((e) => {
+  e.addEventListener('click', (evt) => {
+    evt.preventDefault();
+    Array.from(document.querySelectorAll('#tabs li')).map(makeInactive);
+    makeActive(evt.target.parentElement);
+    Array.from(document.querySelectorAll('.tabbable')).map(hideElement);
+    getElementsToShow(evt).map(showElement);
+  });
+});
+
+});
+</script>
+
+<style>
+  ul#tabs {
+    background: linear-gradient(#fff, #fff 70%, #ddd 98% );
+    width: 100%;
+    margin: 0 0 2rem 0; 
+  }
+
+  ul#tabs li { display: inline-block; }
+  ul#tabs li a { display: inline-block; padding: 1rem 3rem; background-color: #bbb; margin-left: 1rem; border: 1px solid #CCC; border-bottom-width: 0; }
+  ul#tabs li.active a { background-color: #fff; }
+</style>

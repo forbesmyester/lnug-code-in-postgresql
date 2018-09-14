@@ -1,0 +1,7 @@
+---
+layout: post
+title: Begin all Docker files with...
+tag: 
+---
+
+<p>I've just had an extremely frustrating mostly wasted day with Docker. It turns out that, at least with Ubuntu 14.04 the root user is quite messed up, for example it's home directory ends up being just <code>/</code> and worse than that putting files like <code>.ssh/known_hosts</code> in the root (or <code>/root</code>) just does not work, at least for Git checkouts over SSH. I think this is the most elegant solution:</p><pre><code>FROM ubuntu:14.04<br />MAINTAINER YOUR_NAME<br /><br />RUN useradd -m -s /bin/bash ubuntu<br />RUN echo &quot;ubuntu ALL=(ALL) NOPASSWD:ALL&quot; &gt;&gt; /etc/sudoers.d/10-ubuntu_no_password<br /><br /># Uncomment the following for cool provisioning...<br /># RUN sudo su ubuntu -c &quot;ansible-playbook -c local playbook.yml&quot;</code></pre><p>Honestly it took me far to long to come round to this solution, probably because I'm used to Amazon and Vagrant which both give you a working evironment when the machine boots... of course Docker doesn't technically &quot;boot&quot; but I'm not too impressed with how broken it is by default.</p><p>Docker bug open since November: <a href="https://github.com/dotcloud/docker/issues/2968">https://github.com/dotcloud/docker/issues/2968</a></p> <style>pre {     margin: 1em;     background-color: #DDD;     padding: 0.5em;     border: 1px #AAA solid; }  pre code {     padding: 0 0; }  code {     background-color: #DDD;     padding: 0 0.3em; } </style>

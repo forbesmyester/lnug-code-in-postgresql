@@ -1,0 +1,7 @@
+---
+layout: post
+title: 'SyncIt: Storing Data In LocalForage Now Possible'
+tag: 
+---
+
+<p>Over the last few weeks I've done a few commits making storing data in <a href="https://mozilla.github.io/localForage/">LocalForage</a> possible. I knew this would be quite easy as even though <a href="https://github.com/forbesmyester/SyncIt">SyncIt</a> has up to now only been backed by LocalStorage it was wrapped in a way that all access to data had to be done via asyncronous callbacks, infact all but one of the API access points to the underlying storage were identical except one.</p><p>One thing I have noticed is that LocalStorage on Chrome really slows down as you start putting more and more data into it where as LocalForage, which uses <a href="http://www.w3.org/TR/IndexedDB/">IndexedDB</a> on Chrome starts off initially slower but doesn't really seem to slow down at all, or at least slows down much slower.</p><p>So when I'm considering storage client side, I will only really be thinking of LocalStorage when I <strong>know</strong> the data will not grow, for everything else, from now on I'm going to use LocalForage.</p>
