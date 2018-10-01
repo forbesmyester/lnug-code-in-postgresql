@@ -1,6 +1,20 @@
 let { runQuery, output } = require('./_utils');
 
-/* interface Row { [ columnName: string ]: any; } */
+
+/**
+ * interface Row { [ columnName: string ]: any; }
+ * interface HasCircuitId extends Row { circuitId: number; }
+ * interface RaceResult extends HasCircuitId {
+ *   round: number;
+ *   name: string;
+ * }
+ * interface CircuitResult extends HasCircuitId {
+ *   country: string;
+ *   location: string;
+ * }
+ * interface MainResult extends RaceResult, CircuitResult {}
+ */
+
 
 /**
  * Get data from the `results` table.
@@ -46,6 +60,41 @@ function indexBy(columnName, results) {
     }, {});
 }
 
+/**
+ * Given a field name and an object, it will try to retrieve that field from the
+ * object.
+ *
+ * @param fld string
+ * @param obj {}
+ * @return any
+ */
+function get(fld, ob) {
+    if (ob && ob[fld]) {
+        return ob[fld];
+    }
+    return null;
+}
+
+/**
+ * We have both results so join Using `circuitId`, create an index on
+ * `circuitResults` and then map over `raceResults pulling that data in.
+ *
+ * @param [raceResults] RaceResult[]
+ * @param [circuitResults] CircuitResult[]
+ * @return MainResult
+ */
+function perforJoin([racesResults, circuitResults]) => {
+    const indexedCircuitResults = indexBy('circuitId', circuitResults);
+    return racesResults.map(raceRow => {
+        return {
+            round: raceRow.round,
+            name: raceRow.name,
+            country: get('country', indexedCircuitResults[raceRow.circuitId]),
+            location: get('location', indexedCircuitResults[raceRow.circuitId])
+        };
+    });
+}
+
 qryRaces(2017) // Get races results
     .then(racesResults => { // Also get results about the races circuits
         return Promise.all([
@@ -53,18 +102,6 @@ qryRaces(2017) // Get races results
             qryCircuits(racesResults.map(({circuitId}) => circuitId))
         ]);
     })
-    .then(([racesResults, circuitResults]) => { // We have both results so join
-        // Using `circuitId`, create an index on `circuitResults` and then map
-        // over `raceResults pulling that data in.
-        const indexedCircuitResults = indexBy('circuitId', circuitResults);
-        return racesResults.map(raceRow => {
-            return {
-                round: raceRow.round,
-                name: raceRow.name,
-                country: indexedCircuitResults[raceRow.circuitId].country,
-                location: indexedCircuitResults[raceRow.circuitId].location,
-            };
-        });
-    })
+    .then(performJoin)
     .then(output)
     .catch(err => { console.log("ERROR:", err) });
