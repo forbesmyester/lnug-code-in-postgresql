@@ -8,11 +8,16 @@ First configure environmental variables to allow easy PostgreSQL interaction
 export PGUSER=postgres PGPASSWORD=postgres PGDATABASE=postgres PGHOST=127.0.0.1
 ```
 
-Then import the [Ergast](http://ergast.com/) database.
+Then import the [Ergast](http://ergast.com/) database. NOTE: The PostgreSQL version on the web page does not seem to work.
+
 ```sh
 wget http://ergast.com/downloads/f1db_ansi.sql.gz
 cat  f1db_ansi.sql.gz | gzip -d | sed 's/int(..)/int/' | sed 's/ \+AUTO_INCREMENT//' |  sed "s/\\\'/\'\'/g" |  sed 's/UNIQUE KEY \"\(\w\+\)\"/UNIQUE /' | sed 's/^ *KEY .*(\"\(.*\)\")/CHECK ("\1" > 0)/' | sed 's/ date NOT NULL DEFAULT .0000.*,/ date,/'| psql
 ```
+
+## Install Jekyll
+
+ERM...
 
 ## Prepare NodeJS Code
 
