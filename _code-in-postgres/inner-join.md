@@ -14,6 +14,14 @@ categories: postgresql
 ## JS
 
 {% highlight js %}
+{% include code-in-postgres/sql-spitting-image/select.js %}
+{% endhighlight %}
+
+{% highlight js %}
+{% include code-in-postgres/sql-spitting-image/innerJoin.js %}
+{% endhighlight %}
+
+{% highlight js %}
 {% include code-in-postgres/inner-join.js %}
 {% endhighlight %}
 

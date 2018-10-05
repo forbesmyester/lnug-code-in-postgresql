@@ -12,7 +12,7 @@ To Test
 To build results
 
     mkdir -p _includes/code-in-postgres/bin
-    find _includes/code-in-postgres/ | grep 'sql$' | parallel 'cat {} | psql -H  > _includes/code-in-postgres/bin/{/.}.result.html'
+    find _includes/code-in-postgres/ | grep 'sql$' | parallel -j 1 echo {} '&&' cat {} '|' psql -H  '>' _includes/code-in-postgres/bin/{/.}.result.html
 
 {% for item in site["code-in-postgres"] %}
   <h2>{{ item.title }}</h2>

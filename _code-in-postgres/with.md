@@ -1,5 +1,7 @@
 ## Where, Order and Limit
 
+Role of least power (Wikipedia).
+
 Who knows...
      * SQL?
      * WHERE
@@ -9,83 +11,17 @@ Who knows...
      * INNER JOIN
 
 
+
 ## Inner Join
 
 
-select
-    "driverStandings".points,
-    drivers.code,
-    drivers.surname,
-    drivers.forename,
-    races.round,
-    races.year
-from "driverStandings"
-inner join races on races."raceId" = "driverStandings"."raceId"
-inner join drivers on drivers."driverId" = "driverStandings"."driverId"
-where races.year = 2017
-order by "driverStandings".points desc
-limit 1
-
-
-    select year, "round" as round from races
-    where year = 2017
-    order by round desc limit 1
-
-
-## Group
-
-
-    select year, max(round) as round from races group by year
+## Group By
 
 
 ## Sub Select
 
-select
-    "driverStandings".points,
-    drivers.code,
-    drivers.surname,
-    drivers.forename,
-    races."round",
-    races.year
-from "driverStandings"
-inner join races on races."raceId" = "driverStandings"."raceId"
-inner join (
-    select year, max(round) as round
-    from races group by year
-    ) last_round on
-        last_round."round" = races."round" and
-        last_round.year = races.year
-inner join drivers on drivers."driverId" = "driverStandings"."driverId"
-order by races.year desc, "driverStandings".points desc
 
 ## Window
-
-add rank
-
-explain analyze
-
-select
-    "driverStandings".points,
-    drivers.code,
-    drivers.surname,
-    drivers.forename,
-    races."round",
-    races.year,
-    rank() over (order by points desc)
-from "driverStandings"
-inner join races on races."raceId" = "driverStandings"."raceId"
-inner join (
-    select year, max(round) as round from races group by year
-    ) last_round on
-        last_round."round" = races."round" and
-        last_round.year = races.year
-inner join drivers on drivers."driverId" = "driverStandings"."driverId"
-where races.year = 2017
-order by races.year desc, "driverStandings".points desc
-
-If you want all years just partition by year and drop where
-
-explain analyze
 
 select
     "driverStandings".points,
@@ -106,6 +42,9 @@ inner join drivers on drivers."driverId" = "driverStandings"."driverId"
 order by races.year desc, "driverStandings".points desc
 
 ## With
+
+NOTE: With queries are not optimized in respect to final query, only within
+      themselves, so you may want to include items from your main WHERE clause.
 
 explain analyze
 
@@ -128,12 +67,9 @@ inner join last_round_of_season on
     last_round_of_season."round" = races."round" and
     last_round_of_season.year = races.year
 inner join drivers on drivers."driverId" = "driverStandings"."driverId"
-where races.year = 2017
 order by races.year desc, "driverStandings".points desc
 
-with is not optimized as per final query, but the subselect was
-
-explain analyze
+### With Optimization
 
 with
     the_variables (year) as ( values (2017) ),
@@ -173,7 +109,10 @@ with
     ),
     final_points as (
         select
-            "driverStandings"."driverId",
+            "driverStandings".points,
+            drivers.code,
+            drivers.surname,
+            drivers.forename,
             races."round",
             races.year,
             rank() over (partition by races.year order by points desc)
@@ -182,11 +121,11 @@ with
         inner join last_round_of_season on
             last_round_of_season."round" = races."round" and
             last_round_of_season.year = races.year
+        inner join drivers on drivers."driverId" = "driverStandings"."driverId"
         order by races.year desc, "driverStandings".points desc
     ),
     champions as (
         select * from final_points
-        inner join drivers on drivers."driverId" = final_points."driverId"
         where "rank" = 1
         order by year
     )

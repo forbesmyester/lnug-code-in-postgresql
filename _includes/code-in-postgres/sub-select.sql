@@ -1,22 +1,17 @@
-
-select 
-    max_championship_points.year,
-    drivers.code,
-    drivers.suername
-from (
-    select
-        races.year,
-        max("driverStandings".points) as points
-    from races
-    inner join "driverStandings" on races."raceId" = "driverStandings"."raceId"
-    group by races.year
-) max_championship_points
-inner join "driverStandings" on
-    max_championship_points.points = "driverStandings".points and 
-    max_championship_points.year = "driverStandings".year
-inner join drivers on drivers."driverId" = "driverStandings"."driverId"
-
-
+select
     "driverStandings".points,
-    nth_value(drivers.code, 1) over (partition by year order by  desc)
-where year = 2017
+    drivers.code,
+    drivers.surname,
+    drivers.forename,
+    races."round",
+    races.year
+from "driverStandings"
+inner join races on races."raceId" = "driverStandings"."raceId"
+inner join (
+    select year, max(round) as round from races group by year
+    ) last_round on
+        last_round."round" = races."round" and
+        last_round.year = races.year
+inner join drivers on drivers."driverId" = "driverStandings"."driverId"
+order by races.year desc, "driverStandings".points desc
+

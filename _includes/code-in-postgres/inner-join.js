@@ -1,107 +1,70 @@
-let { runQuery, output } = require('./_utils');
+const { runQuery, output } = require('./_utils');
+const select = require('./sql-spitting-image/select');
+const innerJoin = require('./sql-spitting-image/innerJoin');
+const limit = require('./sql-spitting-image/limit');
+const orderBy = require('./sql-spitting-image/orderBy');
 
 
 /**
- * interface Row { [ columnName: string ]: any; }
- * interface HasCircuitId extends Row { circuitId: number; }
- * interface RaceResult extends HasCircuitId {
- *   round: number;
- *   name: string;
- * }
- * interface CircuitResult extends HasCircuitId {
- *   country: string;
- *   location: string;
- * }
- * interface MainResult extends RaceResult, CircuitResult {}
- */
-
-
-/**
- * Get data from the `results` table.
+ * Gets results from a table
  *
- * @param year number
+ * @param table string The of a table to pull from.
+ * @param column The colum to look at to decide when to include a row.
+ * @param values number[] Retreive values where `column` is one of these values.
  * @return Promise<Row[]>
  */
-function qryRaces(year) {
-    return runQuery(
-        'select round, name, "circuitId" from races where year = $1',
-        [year]
-    );
-}
-
-/**
- * Given a set of `circuitIds`, gets data about them from the `results` table.
- *
- * @param circuitIds number[]
- * @return Promise<Row[]>
- */
-function qryCircuits(circuitIds) {
-    if (circuitIds.length == 0) { return []; }
-    const inClause = '(' + circuitIds.map((_, i) => '$' + (i + 1)).join(",") + ')';
+function qryTable(table, column, values) {
+    if (values.length == 0) { return []; }
+    const inClause = '(' + values.map((_, i) => '$' + (i + 1)).join(",") + ')';
     const sql = `
-        select country, location, "circuitId" from circuits
-        where "circuitId" in ${inClause}`;
+        select *
+        from "${table}"
+        where "${column}" in ${inClause}`;
 
-    return runQuery(sql, circuitIds);
+    return runQuery(sql, values);
 }
 
-/**
- * Given an array or Row, looks at the data and indexes them by a specific
- * columnName so you can find a Row quickly without having to `.find()` it.
- *
- * @param columnName string
- * @param results Row[]
- * @return {[columnName: string]: Row}
- */
-function indexBy(columnName, results) {
-    return results.reduce((acc, row) => {
-        acc[row[columnName]] = row;
-        return acc;
-    }, {});
-}
 
-/**
- * Given a field name and an object, it will try to retrieve that field from the
- * object.
- *
- * @param fld string
- * @param obj {}
- * @return any
- */
-function get(fld, ob) {
-    if (ob && ob[fld]) {
-        return ob[fld];
-    }
-    return null;
-}
-
-/**
- * We have both results so join Using `circuitId`, create an index on
- * `circuitResults` and then map over `raceResults pulling that data in.
- *
- * @param [raceResults] RaceResult[]
- * @param [circuitResults] CircuitResult[]
- * @return MainResult
- */
-function perforJoin([racesResults, circuitResults]) => {
-    const indexedCircuitResults = indexBy('circuitId', circuitResults);
-    return racesResults.map(raceRow => {
-        return {
-            round: raceRow.round,
-            name: raceRow.name,
-            country: get('country', indexedCircuitResults[raceRow.circuitId]),
-            location: get('location', indexedCircuitResults[raceRow.circuitId])
-        };
-    });
-}
-
-qryRaces(2017) // Get races results
-    .then(racesResults => { // Also get results about the races circuits
+qryTable('races', 'year', [2017])
+    .then((races) => {
         return Promise.all([
-            racesResults,
-            qryCircuits(racesResults.map(({circuitId}) => circuitId))
+            races,
+            qryTable(
+                'driverStandings',
+                'raceId',
+                races.map(r => r.raceId)
+            ),
         ]);
     })
-    .then(performJoin)
+    .then(([races, driverStandings]) => {
+        return Promise.all([
+            races,
+            driverStandings,
+            qryTable(
+                'drivers',
+                'driverId',
+                driverStandings.map(r => r.driverId)
+            ),
+        ]);
+    })
+    .then(([races, driverStandings, drivers]) => {
+        return innerJoin(
+            'raceId', races,
+            'raceId', innerJoin(
+                'driverId', driverStandings,
+                'driverId', drivers
+            )
+        );
+    })
+    .then(orderBy('points', 'desc'))
+    .then(limit(1))
+    .then(select([
+        ["points", "points"],
+        ["code", "code"],
+        ["surname", "surname"],
+        ["forename", "forename"],
+        ["round", "round"],
+        ["year" , "year"]
+    ]))
     .then(output)
     .catch(err => { console.log("ERROR:", err) });

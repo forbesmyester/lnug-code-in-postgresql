@@ -2,6 +2,12 @@ const { Client } = require('pg');
 const types = require('pg-types');
 const DATE_OID = 1082;
 
+
+/**
+ * interface Row { [ columnName: string ]: any; }
+ */
+
+
 types.setTypeParser(DATE_OID, (v) => {
     return v;
 });
@@ -37,5 +43,6 @@ function output(rows) {
     console.log(r);
     return r;
 }
+
 
 module.exports = { output, runQuery };

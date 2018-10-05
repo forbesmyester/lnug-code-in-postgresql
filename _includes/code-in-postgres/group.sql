@@ -1,5 +1,5 @@
-select "driverId", count(*) as "winCount"
-from results
-where position = 1
-group by "driverId"
-order by "driverId" ASC
+select
+year, max(round) as round
+from races
+group by year
+order by year
