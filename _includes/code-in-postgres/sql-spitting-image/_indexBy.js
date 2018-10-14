@@ -10,7 +10,7 @@ function generateIndexByKey(columnNames, row) {
  * Given an array or Row, looks at the data and indexes them by a specific
  * columnName so you can find a Row quickly without having to `.find()` it.
  *
- * @param columnName string
+ * @param columnNames string[]|string
  * @param results Row[]
  * @return {[columnName: string]: Row[]}
  */

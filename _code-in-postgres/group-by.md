@@ -1,11 +1,17 @@
 ---
 layout: post
 title:  "Perhaps a NoSQL developer might not know about: GROUP BY"
-date:   2018-08-23 21:04:55 +0100
+date:   2018-08-23 21:00:10 +0100
 categories: postgresql
 ---
 
 {% include code-in-postgres/tabs.html %}
+
+## Walkthrough
+
+Nowadays I expect it is 100% possible that some very good programmers have only been exposed to NoSQL databases, not all of which offer the functionality of the SQL `GROUP BY`.
+
+So lets imagine we are one of these developers who do not know about the `GROUP BY` clause. We could write some code like the following:
 
 ## Results
 
@@ -13,13 +19,27 @@ categories: postgresql
 
 ## JS
 
+### Libraries
+
+#### sql-spitting-image/orderBy.js
+
 {% highlight js %}
 {% include code-in-postgres/sql-spitting-image/orderBy.js %}
 {% endhighlight %}
 
+#### sql-spitting-image/_indexBy.js
+
+{% highlight js %}
+{% include code-in-postgres/sql-spitting-image/_indexBy.js %}
+{% endhighlight %}
+
+#### sql-spitting-image/groupBy.js
+
 {% highlight js %}
 {% include code-in-postgres/sql-spitting-image/groupBy.js %}
 {% endhighlight %}
+
+### Main Code
 
 {% highlight js %}
 {% include code-in-postgres/group.js %}
@@ -27,17 +47,13 @@ categories: postgresql
 
 ### Pro's
 
- * `keyValueToRow` appears to be a useful reusable function.
- * The `WHERE` clause should ensure indices are used, even if excessive data is sent over the network.
- * Still relatively small.
+ * To my eyes `groupBy` seems quite elegant and should be re-usable.
+ * The actual main code is quite concise and does what it says.
  
 ### Con's
 
- * Everything matched by the `WHERE` clause would need to be held in memory.
- * The data is translated into key/value pairs then translated back into rows.
- * Relies on the key/value pairs object being ordered to maintain output order which is not strictly correct in JavaScript (but consistently works).
-
-The code above I think is perfectly readable and maintainable. However when we compare it to the SQL code below we can quickly see that if you know the `GROUP BY` clause, it is clearly the way to go if we care about readability or maintainability.
+ * Even though we know `order by` we still need to implement it in JS because it happens after the `group by`.
+ * This is __a lot__ of code.
 
 ## SQL
 
@@ -47,17 +63,12 @@ The code above I think is perfectly readable and maintainable. However when we c
 
 ### Pro's
 
- * Uses the databases indices for the `WHERE` clause and potentially for the `GROUP BY`
- * The bare minimum of data would be sent over the network.
+ * Significantly shorter as similar to the main JavaScrip the SQL describes what you want, not how to do it. The difference is the how does not exist.
+ * Less bandwith used between the database server and it's client
 
 ### Con's
 
  * It requires knowledge of how `GROUP BY` works.
-
-
-Nowadays I expect it is 100% possible that some very good programmers have only been exposed to NoSQL databases, not all of which offer the functionality of the SQL `GROUP BY`.
-
-So lets imagine we are one of these developers who do not know about the `GROUP BY` clause. We could write some code like the following:
 
 <script>
 (function() {

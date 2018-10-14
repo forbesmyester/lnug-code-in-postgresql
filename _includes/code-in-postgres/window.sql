@@ -1,14 +1,17 @@
-
 select
-    races.year,
-    "races"."round",
     "driverStandings".points,
     drivers.code,
     drivers.surname,
     drivers.forename,
-    rank() over (partition by year, "races"."round" order by "driverStandings"."raceId" desc, points desc)
-from "driverStandings"
+    races."round",
+    races.year,
+    rank() over (partition by races.year order by points desc)
+from races 
+inner join "driverStandings" on races."raceId" = "driverStandings"."raceId"
+inner join (
+    select year, max(round) as round from races group by year
+    ) last_round on
+        last_round."round" = races."round" and
+        last_round.year = races.year
 inner join drivers on drivers."driverId" = "driverStandings"."driverId"
-inner join races on races."raceId" = "driverStandings"."raceId"
-where year = 1994
-order by races.year desc, "races"."round" asc, "driverStandings".points desc
+order by races.year desc, "driverStandings".points desc

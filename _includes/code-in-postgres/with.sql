@@ -1,21 +1,21 @@
+with
+    last_round_of_season as (
+        select year, max(round) as round from races
+        group by year
+    )
 select
     "driverStandings".points,
     drivers.code,
     drivers.surname,
     drivers.forename,
     races."round",
-    races.year
+    races.year,
+    rank() over (partition by races.year order by points desc)
 from races 
 inner join "driverStandings" on races."raceId" = "driverStandings"."raceId"
-inner join (
-    select year, max(round) as round from races group by year
-    ) last_round on
-        last_round."round" = races."round" and
-        last_round.year = races.year
+inner join last_round_of_season on
+    last_round_of_season."round" = races."round" and
+    last_round_of_season.year = races.year
 inner join drivers on drivers."driverId" = "driverStandings"."driverId"
-/*
-Causes the sub select to be optimized also
-where races.year = 2017
- */
 order by races.year desc, "driverStandings".points desc
 

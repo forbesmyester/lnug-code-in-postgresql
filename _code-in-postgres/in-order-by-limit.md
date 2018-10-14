@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "You can do lots with just IN, ORDER BY and LIMIT"
-date:   2018-08-14 21:04:55 +0100
+date:   2018-08-14 21:00:00 +0100
 categories: postgresql
 ---
 
@@ -15,25 +15,37 @@ categories: postgresql
 
 ## JS
 
+### Libraries
+
+#### sql-spitting-image/limit.js
+
 {% highlight js %}
 {% include code-in-postgres/sql-spitting-image/limit.js %}
 {% endhighlight %}
+
+#### sql-spitting-image/orderBy.js
 
 {% highlight js %}
 {% include code-in-postgres/sql-spitting-image/orderBy.js %}
 {% endhighlight %}
 
+### Main Code
+
 {% highlight js %}
 {% include code-in-postgres/in-order-by-limit.js %}
 {% endhighlight %}
 
+XXX
 ### Pro's
 
- * TODO
+ * There's some nice re-usable functions here.
+ * The main code is quite concise and easy to understand.
+ * Only data from the database which is required is brought over.
 
 ### Con's
 
- * TODO
+ * Longer than SQL
+ * There is that nasty `if` condition in `qryMain`.
 
 ## SQL
 
@@ -43,11 +55,11 @@ categories: postgresql
 
 ### Pro's
 
- * TODO
+ * Shorter than the JavaScript.
 
 ### Con's
 
- * TODO
+ * Is the `order by` / `limit 1` a trick?
 
 <script>
 (function() {

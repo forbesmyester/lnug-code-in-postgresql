@@ -1,7 +1,7 @@
 ---
 layout: post
-title:  "Thankfully I think everyone knows about: WHERE"
-date:   2018-08-14 21:04:55 +0100
+title:  "XXX Thankfully I think everyone knows about: WHERE"
+date:   2018-08-14 01:00:00 +0100
 categories: postgresql
 ---
 

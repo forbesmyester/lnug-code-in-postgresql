@@ -1,144 +1,87 @@
-## Where, Order and Limit
+---
+layout: post
+title:  With
+date:   2018-08-23 21:00:20 +0100
+categories: postgresql
+---
 
-Role of least power (Wikipedia).
+{% include code-in-postgres/tabs.html %}
 
-Who knows...
-     * SQL?
-     * WHERE
-     * ORDER
-     * LIMIT
-     * IN
-     * INNER JOIN
+## Results
 
+{% include code-in-postgres/bin/with.result.html %}
 
+## JS
 
-## Inner Join
+### Libraries
 
+#### sql-spitting-image/select.js
 
-## Group By
+{% highlight js %}
+{% include code-in-postgres/sql-spitting-image/select.js %}
+{% endhighlight %}
 
+#### sql-spitting-image/innerJoin.js
 
-## Sub Select
+{% highlight js %}
+{% include code-in-postgres/sql-spitting-image/innerJoin.js %}
+{% endhighlight %}
 
+#### sql-spitting-image/limit.js
 
-## Window
+{% highlight js %}
+{% include code-in-postgres/sql-spitting-image/limit.js %}
+{% endhighlight %}
 
-select
-    "driverStandings".points,
-    drivers.code,
-    drivers.surname,
-    drivers.forename,
-    races."round",
-    races.year,
-    rank() over (partition by races.year order by points desc)
-from "driverStandings"
-inner join races on races."raceId" = "driverStandings"."raceId"
-inner join (
-    select year, max(round) as round from races group by year
-    ) last_round on
-        last_round."round" = races."round" and
-        last_round.year = races.year
-inner join drivers on drivers."driverId" = "driverStandings"."driverId"
-order by races.year desc, "driverStandings".points desc
+#### sql-spitting-image/orderBy.js
 
-## With
+{% highlight js %}
+{% include code-in-postgres/sql-spitting-image/orderBy.js %}
+{% endhighlight %}
+
+#### sql-spitting-image/qryTable.js
+
+{% highlight js %}
+{% include code-in-postgres/sql-spitting-image/qryTable.js %}
+{% endhighlight %}
+
+### Main Code
+
+{% highlight js %}
+{% include code-in-postgres/with.js %}
+{% endhighlight %}
+
+### Pro's
+
+ * X
+
+### Con's
+
+ * X
+
+## SQL
 
 NOTE: With queries are not optimized in respect to final query, only within
       themselves, so you may want to include items from your main WHERE clause.
 
-explain analyze
+{% highlight sql linenos %}
+{% include code-in-postgres/with.sql %}
+{% endhighlight %}
 
-with
-    last_round_of_season as (
-        select year, max(round) as round from races
-        group by year
-    )
-select
-    "driverStandings".points,
-    drivers.code,
-    drivers.surname,
-    drivers.forename,
-    races."round",
-    races.year,
-    rank() over (partition by races.year order by points desc)
-from "driverStandings"
-inner join races on races."raceId" = "driverStandings"."raceId"
-inner join last_round_of_season on
-    last_round_of_season."round" = races."round" and
-    last_round_of_season.year = races.year
-inner join drivers on drivers."driverId" = "driverStandings"."driverId"
-order by races.year desc, "driverStandings".points desc
+### Pro's
 
-### With Optimization
+ * X
 
-with
-    the_variables (year) as ( values (2017) ),
-    last_round_of_season as (
-        select races.year, max(round) as round from races
-        cross join the_variables
-        where races.year = the_variables.year
-        group by races.year
-    )
-select
-    "driverStandings".points,
-    drivers.code,
-    drivers.surname,
-    drivers.forename,
-    races."round",
-    races.year,
-    rank() over (partition by races.year order by points desc)
-from "driverStandings"
-inner join races on races."raceId" = "driverStandings"."raceId"
-inner join last_round_of_season on
-    last_round_of_season."round" = races."round" and
-    last_round_of_season.year = races.year
-inner join drivers on drivers."driverId" = "driverStandings"."driverId"
-cross join the_variables
-where races.year = the_variables.year
-order by races.year desc, "driverStandings".points desc
+### Con's
 
-## Serve directly from DB
+ * X
 
-remove our the_variables and remove stuff from final_points
-explain no where with rank
-
-with
-    last_round_of_season as (
-        select races.year, max(round) as round from races
-        group by races.year
-    ),
-    final_points as (
-        select
-            "driverStandings".points,
-            drivers.code,
-            drivers.surname,
-            drivers.forename,
-            races."round",
-            races.year,
-            rank() over (partition by races.year order by points desc)
-        from "driverStandings"
-        inner join races on races."raceId" = "driverStandings"."raceId"
-        inner join last_round_of_season on
-            last_round_of_season."round" = races."round" and
-            last_round_of_season.year = races.year
-        inner join drivers on drivers."driverId" = "driverStandings"."driverId"
-        order by races.year desc, "driverStandings".points desc
-    ),
-    champions as (
-        select * from final_points
-        where "rank" = 1
-        order by year
-    )
-select
-    concat(forename, ' ', surname) as k,
-    json_build_object(
-        'forename', forename,
-        'surname', surname,
-        'count', count(year),
-        'championships', jsonb_agg(year)
-    ) as v
-from champions
-group by surname, forename
-order by surname, 1
-
-# Custom Aggregate
+<script>
+(function() {
+    {% include jekyll-create-sections-from-headers.js %}
+    {% include code-in-postgres/create-sections-to-support.js %}
+}())
+</script>
+<style>
+    {% include code-in-postgres/compare.css %}
+</style>

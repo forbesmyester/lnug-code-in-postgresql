@@ -9,4 +9,16 @@ section.con ul li::before, section.pro ul li::before { padding-right: 1.1225em; 
 section.pro ul li::before { color: green;  content: "✔"; }
 section.con ul li::before { color: red; content: "✘"; }
 
+.sql-splitting-image h4:hover { cursor: pointer; text-decoration: underline }
+.sql-splitting-image h4::before { content: " ▹ "; }
+.sql-splitting-image figure { display: none; }
+.sql-splitting-image.open h4::before { content: " ▿ "; }
+.sql-splitting-image.open figure { display: block; }
 
+figure pre { padding: 0 }
+figure pre td { padding: 0 }
+figure pre td:first-child {
+  margin-right: 1rem;
+  background-color: #CCC;
+}
+figure pre table { margin-bottom: 0 }

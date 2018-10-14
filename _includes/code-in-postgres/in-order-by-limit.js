@@ -4,15 +4,8 @@ const orderBy = require('./sql-spitting-image/orderBy');
 
 
 /**
- * interface Row { [ columnName: string ]: any; }
- * interface RaceResult {
- *   round: number;
- * }
- * interface MainResult {
- *   points: number;
- *   driverId: number;
- *   year: number;
- * }
+ * interface RaceResult { round: number; }
+ * interface MainResult { points: number; driverId: number; year: number; }
  */
 
 
