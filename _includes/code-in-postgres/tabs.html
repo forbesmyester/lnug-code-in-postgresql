@@ -6,6 +6,7 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+let first = true;
 
 function getElementsToShow(evt) {
   return Array.from(document.querySelectorAll(
@@ -13,7 +14,13 @@ function getElementsToShow(evt) {
   ));
 }
 
-function showElement(el) { el.style.display = 'block'; }
+function showElement(el) {
+  if (first) {
+    el.classList.add('first')
+  }
+  first = false;
+  el.style.display = 'block';
+}
 
 function hideElement(el) { el.style.display = 'none'; }
 
@@ -30,6 +37,7 @@ Array.from(document.querySelectorAll('#tabs a')).map((e) => {
     Array.from(document.querySelectorAll('#tabs li')).map(makeInactive);
     makeActive(evt.target.parentElement);
     Array.from(document.querySelectorAll('.tabbable')).map(hideElement);
+    first = true;
     getElementsToShow(evt).map(showElement);
   });
 });

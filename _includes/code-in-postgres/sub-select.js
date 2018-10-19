@@ -6,53 +6,27 @@ const orderBy = require('./sql-spitting-image/orderBy');
 const qryTable = require('./sql-spitting-image/qryTable');
 
 
-/**
- * Gets the max rounds for all years
- *
- * @return Promise<Row[]>
- */
-function lastRoundOfSeason(table, column, values) {
-    return runQuery(`select year, max(round) as round from races group by year`);
-}
+let promises = [
+    qryTable('races'),
+    qryTable('driverStandings'),
+    qryTable('drivers'),
+    runQuery(`select year, max(round) as round from races group by year`)
+];
 
 
-Promise.all([qryTable('races'), lastRoundOfSeason()])
-    .then(([races, lastRoundOfSeason]) => {
-        return Promise.all([
-            races,
-            lastRoundOfSeason,
-            qryTable(
-                'driverStandings',
-                'raceId',
-                races.map(r => r.raceId)
-            ),
-        ]);
-    })
-    .then(([races, lastRoundOfSeason, driverStandings]) => {
-        return Promise.all([
-            races,
-            lastRoundOfSeason,
-            driverStandings,
-            qryTable(
-                'drivers',
-                'driverId',
-                driverStandings.map(r => r.driverId)
-            ),
-        ]);
-    })
-    .then(([races, lastRoundOfSeason, driverStandings, drivers]) => {
+Promise.all(promises)
+    .then(([races, driverStandings, drivers, lastRoundOfSeason]) => {
         return innerJoin(
-            'driverId', drivers,
-            'driverId', innerJoin(
-                ['year', 'round'], lastRoundOfSeason,
-                ['year', 'round'], innerJoin(
+            ['round', 'year'], lastRoundOfSeason,
+            ['round', 'year'], innerJoin(
+                'driverId', drivers,
+                'driverId', innerJoin(
                     'raceId', driverStandings,
                     'raceId', races
                 )
             )
         );
     })
-    .then(orderBy([['year', 'desc'], ['points', 'desc']]))
     .then(select([
         ["points", "points"],
         ["code", "code"],
@@ -61,5 +35,7 @@ Promise.all([qryTable('races'), lastRoundOfSeason()])
         ["round", "round"],
         ["year" , "year"]
     ]))
+    .then(orderBy([['year', 'desc'], ['points', 'desc']]))
     .then(output)
     .catch(err => { console.log("ERROR:", err) });
+

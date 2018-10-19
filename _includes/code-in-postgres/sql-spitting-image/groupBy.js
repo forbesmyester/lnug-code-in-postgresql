@@ -2,11 +2,18 @@ const indexBy = require('./_indexBy');
 let assert = require('assert');
 
 
-const funcs = {
-    max: (acc, item) => {
-        if (acc === undefined) { return item; }
-        return item > acc ? item : acc
-    }
+function handleFirst(agg) {
+    return function implHandleFirstUndefined(acc, item) {
+        console.log(agg, acc, item);
+        if ((acc === undefined) && (agg.hasOwnProperty('init'))) {
+            console.log('here');
+            acc = init;
+        }
+        if (acc === undefined) {
+            return item;
+        }
+        return agg.fun(acc, item);
+    };
 }
 
 
@@ -20,7 +27,9 @@ function prop(k) {
 function processGroup(aggregations, rows) {
     return aggregations.reduce(
         (acc, agg) => {
-            acc[agg.out] = rows.map(prop(agg.col)).reduce(funcs[agg.fun]);
+            acc[agg.out] = rows.map(prop(agg.col)).reduce(
+                handleFirst(agg)
+            );
             return acc;
         },
         {}
@@ -31,7 +40,20 @@ function processGroup(aggregations, rows) {
 assert.deepEqual(
     {rnd: 8},
     processGroup(
-        [{ col: 'round', fun: 'max', out: 'rnd' }],
+        [{ col: 'round', fun: Math.max, out: 'rnd' }],
+        [
+            { year: 2017, month: 2, round: 4, name: "San Marino GP" },
+            { year: 2017, month: 3, round: 8, name: "Monaco GP" },
+            { year: 2017, month: 3, round: 6, name: "British GP" },
+        ]
+    )
+);
+
+
+assert.deepEqual(
+    {rnd: 9},
+    processGroup(
+        [{ col: 'round', fun: Math.max, out: 'rnd', init: 9 }],
         [
             { year: 2017, month: 2, round: 4, name: "San Marino GP" },
             { year: 2017, month: 3, round: 8, name: "Monaco GP" },
@@ -75,7 +97,7 @@ const races = [
 
 
 assert.deepEqual(
-    groupBy(['year', 'month'], [{ col: 'round', fun: 'max', out: 'rnd' }])(races),
+    groupBy(['year', 'month'], [{ col: 'round', fun: Math.max, out: 'rnd' }])(races),
     [
         { year: 2017, month: 2, rnd: 4 },
         { year: 2017, month: 3, rnd: 8 },

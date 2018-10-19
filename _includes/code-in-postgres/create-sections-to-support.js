@@ -6,7 +6,6 @@ process(
     document.querySelector('div.post-content'),
     2,
     function(s) {
-        console.log(s);
         if (['js', 'sql'].indexOf(s.toLowerCase()) > -1) {
             return [
                 'tabbable',

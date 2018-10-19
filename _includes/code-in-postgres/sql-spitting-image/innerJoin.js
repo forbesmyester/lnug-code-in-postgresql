@@ -6,13 +6,13 @@ let assert = require('assert');
  * We have both results so join Using `circuitId`, create an index on
  * `circuitResults` and then map over `raceResults pulling that data in.
  *
- * @param columnA string A key within resultA
+ * @param colOrColsA string|string[] A key within resultA
  * @param resultsA Row[]
- * @param columnB string A key within resultB
+ * @param colOrColsB string|string[] A key within resultB
  * @param resultsB Row[]
  * @return Row[]
  */
-function innerJoin(columnA, resultsA, columnB, resultsB) {
+function innerJoin(colOrColsA, resultsA, colOrColsB, resultsB) {
 
     function flattenOne(arr) {
         let r = [];
@@ -37,8 +37,8 @@ function innerJoin(columnA, resultsA, columnB, resultsB) {
         }
     }
 
-    const indexedResultsA = indexBy(columnA, resultsA);
-    const indexedResultsB = indexBy(columnB, resultsB);
+    const indexedResultsA = indexBy(colOrColsA, resultsA);
+    const indexedResultsB = indexBy(colOrColsB, resultsB);
 
     return Object.keys(indexedResultsA).reduce(
         (acc, key) => {

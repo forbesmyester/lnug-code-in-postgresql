@@ -11,20 +11,6 @@ categories: postgresql
 
 {% include code-in-postgres/bin/variables.result.html %}
 
-## JS
-
-{% highlight js %}
-{% include code-in-postgres/variables.js %}
-{% endhighlight %}
-
-### Pro's
-
- * X
-
-### Con's
-
- * X
-
 ## SQL
 
 {% highlight sql linenos %}
@@ -33,11 +19,13 @@ categories: postgresql
 
 ### Pro's
 
- * X
+ * Returns the optimizations that were lost between [sub-select](./sub-select.html) and [with](./with.html)
+ * Keeps the ability to name a sub selection like what was introduced in the [with](./with.html).
+ * Variables now have names as apposed to just `$1`, `$2` which makes it more readable should your PostgreSQL library only have positional parameter support.
 
 ### Con's
 
- * X
+ * It's a bit of a hack, even if it has no performance downsides and those `cross join`'s add extra noise.
 
 <script>
 (function() {

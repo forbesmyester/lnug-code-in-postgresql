@@ -51,13 +51,13 @@ Because the `inner join` also embedded `where`'s this code ended up being very s
 
 ### Pro's
 
- * I am not sure there are any good bits of this code compared to the JavaScript. We've not created any new re-usable functions and the actual main code, while being difficult to slim down further feels like it is full of implementation details.
+ * The code at least is still quite tidy.
 
 ### Con's
 
+ * The nested `innerJoin` calls now seem messy.
  * Even though we know `order by` we've had to do it in JavaScript because that is where the data is by that point.
- * This code, for performance reasons needs to load data from both `drivers` and `driverStandings` using a `where` clause which is not something that has to happen in the pure SQL version.
- * Because of the extra `where` clauses we need to bring in the data in sequence.
+ * Like the [inner-join](./inner-join.md) this pulls over whole datasets which does not occur in the SQL version.
 
 ## SQL
 {% highlight sql linenos %}
@@ -66,11 +66,13 @@ Because the `inner join` also embedded `where`'s this code ended up being very s
 
 ### Pro's
 
- * X
+ * Shorter.
+ * Not really any more difficult to understand than [inner-join](./inner-join.md).
+ * The optimizer works out the most efficient way of getting the desired results, using indexes right now, but if you were to filter by year, for example, the sub-query would be optimized automatically.
 
 ### Con's
 
- * X
+ * None
 
 <script>
 (function() {

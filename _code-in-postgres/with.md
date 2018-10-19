@@ -53,16 +53,14 @@ categories: postgresql
 
 ### Pro's
 
- * X
+ * The code at least is still quite tidy.
+ * Has the slight advantage over [sub-select](./sub-select.html) that `lastRoundOfSeason()` now has a name.
 
 ### Con's
 
- * X
+ * All the same problems as [sub-select](./sub-select.html).
 
 ## SQL
-
-NOTE: With queries are not optimized in respect to final query, only within
-      themselves, so you may want to include items from your main WHERE clause.
 
 {% highlight sql linenos %}
 {% include code-in-postgres/with.sql %}
@@ -70,11 +68,11 @@ NOTE: With queries are not optimized in respect to final query, only within
 
 ### Pro's
 
- * X
+ * The ability to name to a section of code is incredibly important because the developer can think about it as one thing, as opposed to the details that make it up.
 
 ### Con's
 
- * X
+ * Adding a `where races.year = 2017` to the main query does not, at present limit the data which is retreived in `last_round_of_season`.
 
 <script>
 (function() {

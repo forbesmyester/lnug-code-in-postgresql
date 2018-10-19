@@ -10,7 +10,7 @@ const qry = `
 
 
 runQuery(qry)
-    .then(groupBy(['year'], [{ fun: 'max', col: 'round', out: 'round' }]))
+    .then(groupBy(['year'], [{ fun: Math.max, col: 'round', out: 'round' }]))
     .then(orderBy('year'))
     .then(output)
     .catch(err => { console.log("ERROR:", err) });

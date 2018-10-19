@@ -1,10 +1,10 @@
 with
-    the_variables (year_count) as ( values (30) ),
+    the_variables (min_year) as ( values (2010) ),
     last_round_of_season as (
         select races.year, max(round) as round from races
+        cross join the_variables
+        where races.year >= the_variables.min_year
         group by races.year
-        order by year desc
-        limit 30
     ),
     final_points as (
         select
@@ -21,7 +21,6 @@ with
             last_round_of_season."round" = races."round" and
             last_round_of_season.year = races.year
         inner join drivers on drivers."driverId" = "driverStandings"."driverId"
-        order by races.year desc, "driverStandings".points desc
     ),
     champions as (
         select * from final_points

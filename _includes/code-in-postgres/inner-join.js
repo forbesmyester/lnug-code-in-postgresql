@@ -5,11 +5,13 @@ const limit = require('./sql-spitting-image/limit');
 const qryTable = require('./sql-spitting-image/qryTable');
 const innerJoin = require('./sql-spitting-image/innerJoin');
 
+
 let promises = [
     qryTable('races', 'year', [2017]),
     qryTable('driverStandings'),
     qryTable('drivers')
 ];
+
 
 Promise.all(promises)
     .then(([races, driverStandings, drivers]) => {
