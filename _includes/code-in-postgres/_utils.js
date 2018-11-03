@@ -45,4 +45,10 @@ function output(rows) {
 }
 
 
-module.exports = { output, runQuery };
+function assoc(k, v, ob) {
+    let m = {};
+    m[k] = v;
+    return Object.assign({}, ob, m);
+}
+
+module.exports = { assoc, output, runQuery };
