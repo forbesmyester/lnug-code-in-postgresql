@@ -4,11 +4,6 @@ let assert = require('assert');
 
 function handleFirst(agg) {
     return function implHandleFirstUndefined(acc, item) {
-        console.log(agg, acc, item);
-        if ((acc === undefined) && (agg.hasOwnProperty('init'))) {
-            console.log('here');
-            acc = init;
-        }
         if (acc === undefined) {
             return item;
         }
@@ -28,7 +23,8 @@ function processGroup(aggregations, rows) {
     return aggregations.reduce(
         (acc, agg) => {
             acc[agg.out] = rows.map(prop(agg.col)).reduce(
-                handleFirst(agg)
+                handleFirst(agg),
+                agg.hasOwnProperty('init') ? agg.init : undefined
             );
             return acc;
         },

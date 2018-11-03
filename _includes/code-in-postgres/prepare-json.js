@@ -37,19 +37,31 @@ const sql = `
         where "rank" = 1
         order by year`;
 
-function concat(acc, item) {
-    return acc.concat([item]);
+function concat(acc, item) { return acc.concat([item]); }
+function count(acc, _) { return acc + 1; }
+
+function objectify(keyFields) {
+    return function(records) {
+        function mapper(record) {
+            const k = keyFields.map(kf => record[kf]).join(' ');
+            const v = JSON.stringify(record);
+            return { k, v: record };
+        };
+        return records.map(mapper);
+    };
 }
 
 runQuery(sql, [2010])
-    .then(results => {
-        return groupBy(
+    .then(
+        groupBy(
             ['forename', 'surname'],
             [
-                { fun: concat, col: 'year', out: 'championships', init: [] }
+                { fun: concat, col: 'year', out: 'championships', init: [] },
+                { fun: count, col: 'count', out: 'count', init: 0 }
             ]
-        )(results);
-    })
+        )
+    )
+    .then(objectify(['forename', 'surname']))
     .then(output)
     .catch(err => { console.log("ERROR:", err) });
 
