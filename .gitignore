@@ -4,3 +4,6 @@ _site
 node_modules
 f1db_ansi.sql.gz
 env
+files.tf
+_private/
+.terraform

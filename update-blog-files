@@ -1,0 +1,41 @@
+#!/usr/bin/env node
+
+const glob = require('glob');
+const Handlebars = require("handlebars");
+const path = require('path');
+
+function getFiles(cwd) {
+	return new Promise(function(resolve, reject) {
+		glob('**/*', { cwd, nodir: true }, function(err, files) {
+			if (err) { return reject(err); }
+			resolve(files);
+		});
+	});
+}
+
+function fileStrToObj(filename) {
+	const address = filename.toLowerCase().replace(/[^a-z0-9]/g, '_');
+	const key = filename;
+	const source = path.join('_site', filename);
+	const extension = filename.replace(/.*\./, '');
+	return { extension, address, source, key };
+}
+
+const txtTpl = [
+	'{{#files}}',
+	'resource "aws_s3_bucket_object" "file_{{{ address }}}" {',
+	' bucket = "\${aws_s3_bucket.website.bucket}"',
+	' key = "{{{ key }}}"',
+	' source = "{{{ source }}}"',
+	' content_type = "${lookup(var.mime_types, "{{{ extension }}}", "application/bin")}"',
+	' etag = "${md5(file("{{{ source }}}"))}"',
+	'}',
+	'{{/files}}'].join("\n");
+
+var tpl = Handlebars.compile(txtTpl);
+
+getFiles('_site')
+	.then((filenames) => filenames.map(fileStrToObj))
+	.then(files => { return { files }; })
+	.then(tpl)
+	.then(console.log);

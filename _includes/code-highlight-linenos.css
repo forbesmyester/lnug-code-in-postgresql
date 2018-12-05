@@ -1,0 +1,10 @@
+figure pre { margin: 0; padding: 0; border: 0; }
+figure pre * { margin: 0; padding: 0; border: 0; }
+figure pre code td:first-child { padding-right: 0.5rem; text-align: right; }
+figure pre code td:first-child pre {
+  background-color: #CCC;
+  padding: 0 0.25rem 0 0.25rem;
+  border-right: solid #777;
+}
+figure pre code table { margin-bottom: 0 }
+
