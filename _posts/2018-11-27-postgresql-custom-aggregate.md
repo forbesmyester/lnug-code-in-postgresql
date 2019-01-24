@@ -48,7 +48,7 @@ Therefore if you wanted to get the average of the three highest numbers you may 
 {% include sql-custom-aggregate.js %}
 {% endhighlight %}
 
-And get the answer `6`.
+And get the answer `2`.
 
 ## Converting the JavaScript back to SQL
 

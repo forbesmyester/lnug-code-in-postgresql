@@ -5,7 +5,7 @@ function get_race_time(comp_count) {
             return accumulator.concat([currentValue]);
         }
         const r = accumulator.concat([currentValue]);
-        const min = accumulator.reduce((a, b) => Math.min(a, b), 99);
+        const min = accumulator.reduce((a, b) => Math.max(a, b), -1);
         r.splice(r.indexOf(min), 1);
         return r;
     };
@@ -28,4 +28,3 @@ function get_race_time(comp_count) {
 }
 
 const race_time = get_race_time(3);
-console.log(race_time([0, 1, 2, 3]));

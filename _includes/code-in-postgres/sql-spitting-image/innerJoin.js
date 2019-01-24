@@ -46,9 +46,11 @@ function innerJoin(colOrColsA, resultsA, colOrColsB, resultsB) {
                 return acc;
             }
             return acc.concat(
-                flattenOne(indexedResultsA[key].map(
-                    joinRows(indexedResultsB[key])
-                ))
+                flattenOne(
+                    indexedResultsA[key].map(
+                        joinRows(indexedResultsB[key])
+                    )
+                )
             );
         },
         []
