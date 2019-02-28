@@ -13,3 +13,6 @@ where races.year = 2017
 order by "driverStandings".points desc
 limit 1
 
+select * from "driverStandings" where "raceId" = 899 order by "points" desc limit 10
+
+select * from drivers
