@@ -1,0 +1,21 @@
+[races]
+*raceId
+year
+round
+circuitId
+name
+date
+time
+url
+
+
+[driverStandings]
+driverStandingsId
+raceId
+driverId
+points
+position
+positionText
+wins
+
+driverStandings *--1 races

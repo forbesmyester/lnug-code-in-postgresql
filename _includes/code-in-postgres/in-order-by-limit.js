@@ -24,23 +24,42 @@ function qryRaces(year) {
 
 
 /**
+ * Takes an Array of Array and converts it into just an Array by removing one
+ * level of nesting.
+ *
+ * @param Array<Array<T>>
+ * @return Array<T>
+ */
+function flatten(rowOfRows) {
+    return rowOfRows.reduce((acc, rows) => acc.concat(rows), []);
+}
+
+
+/**
  * Gets all driver standings at a given set of raceIds
  *
  * @param raceIds number[]
  * @return Promise<MainResult[]>
  */
 function qryMain(raceIds) {
+
     if (raceIds.length == 0) { return []; }
-    const inClause = '(' + raceIds.map((_, i) => '$' + (i + 1)).join(",") + ')';
-    const sql = `
-        select
+
+    const promises = raceIds.map((raceId) => {
+        const sql = `
+            select
             "driverStandings".points,
             "driverStandings"."driverId",
             2017 as year
-        from "driverStandings"
-        where "raceId" in ${inClause}`;
+            from "driverStandings"
+            where "raceId" = $1
+            `;
+        return runQuery(sql, [raceId]);
+    });
 
-    return runQuery(sql, raceIds);
+    return Promise.all(promises).then(
+        flatten
+    );
 }
 
 
