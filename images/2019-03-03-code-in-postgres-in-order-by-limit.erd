@@ -10,9 +10,9 @@ url
 
 
 [driverStandings]
-driverStandingsId
-raceId
-driverId
+*driverStandingsId
++raceId
++driverId
 points
 position
 positionText

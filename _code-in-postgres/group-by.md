@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Perhaps a NoSQL developer might not know about: GROUP BY"
+title:  "A NoSQL developer might not know about: GROUP BY"
 date:   2018-08-23 21:00:10 +0100
 categories: postgresql
 ---

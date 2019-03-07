@@ -1,4 +1,4 @@
-let { runQuery, output } = require('./_utils');
+const { flatten, runQuery, output } = require('./_utils');
 const limit = require('./sql-spitting-image/limit');
 const orderBy = require('./sql-spitting-image/orderBy');
 
@@ -16,22 +16,7 @@ const orderBy = require('./sql-spitting-image/orderBy');
  * @return Promise<RaceResult[]>
  */
 function qryRaces(year) {
-    return runQuery(
-        'select "raceId" from races where year = $1',
-        [year]
-    );
-}
-
-
-/**
- * Takes an Array of Array and converts it into just an Array by removing one
- * level of nesting.
- *
- * @param Array<Array<T>>
- * @return Array<T>
- */
-function flatten(rowOfRows) {
-    return rowOfRows.reduce((acc, rows) => acc.concat(rows), []);
+    return runQuery('select "raceId" from races where year = $1', [year]);
 }
 
 
@@ -41,9 +26,7 @@ function flatten(rowOfRows) {
  * @param raceIds number[]
  * @return Promise<MainResult[]>
  */
-function qryMain(raceIds) {
-
-    if (raceIds.length == 0) { return []; }
+function qryStandings(raceIds) {
 
     const promises = raceIds.map((raceId) => {
         const sql = `
@@ -57,15 +40,13 @@ function qryMain(raceIds) {
         return runQuery(sql, [raceId]);
     });
 
-    return Promise.all(promises).then(
-        flatten
-    );
+    return Promise.all(promises).then(flatten);
 }
 
 
 qryRaces(2017)
     .then(racesResults => {
-        return qryMain(racesResults.map(({raceId}) => raceId));
+        return qryStandings(racesResults.map(({raceId}) => raceId));
     })
     .then(orderBy('points', 'desc'))
     .then(limit(1))

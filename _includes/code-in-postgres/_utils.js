@@ -45,10 +45,30 @@ function output(rows) {
 }
 
 
+/**
+ * Adds a value to an Object.
+ *
+ * @param k string Where the value will be stored.
+ * @param v any The value.
+ * @param ob The Object to add the value to.
+ * @return A shallow copy of `ob` with `v` added at `k`.
+ */
 function assoc(k, v, ob) {
     let m = {};
     m[k] = v;
     return Object.assign({}, ob, m);
 }
 
-module.exports = { assoc, output, runQuery };
+/**
+ * Takes an Array of Array and converts it into just an Array by removing one
+ * level of nesting.
+ *
+ * @param Array<Array<T>>
+ * @return Array<T>
+ */
+function flatten(rowOfRows) {
+    return rowOfRows.reduce((acc, rows) => acc.concat(rows), []);
+}
+
+
+module.exports = { assoc, flatten, output, runQuery };

@@ -13,6 +13,10 @@
 function process(mainElement, headerLevel, sectionClassModifier) {
 
 
+  function headingToCssDefaultCssClass(s) {
+    return s.toLowerCase().replace(/[^a-z0-9]/g,'-');
+  }
+
   /**
    * Trims whitespace from start and end of a string
    *
@@ -28,7 +32,7 @@ function process(mainElement, headerLevel, sectionClassModifier) {
    */
   function createSection(classes, fullHeader) {
     var e = document.createElement('section');
-    classes.forEach(function(c) { e.classList.add(c); });
+    classes.forEach(function(c) { console.log(c); e.classList.add(headingToCssDefaultCssClass(c)); });
     e.dataset.heading = fullHeader;
     return e;
   }

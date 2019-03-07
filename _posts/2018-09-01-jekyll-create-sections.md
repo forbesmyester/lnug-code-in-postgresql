@@ -1,7 +1,6 @@
 ---
 layout: post
 title:  "Jekyll: How to get `<section>` in Jekyll markdown based on `<h2>` tags."
-categories: postgresql
 ---
 
 I wanted to make a blog post which a future [LNUG](https://lnug.org/) talk will be based on to compare achieving the same output in both NodeJS and PostgreSQL.

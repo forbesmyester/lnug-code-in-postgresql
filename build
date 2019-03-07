@@ -1,4 +1,0 @@
-#!/bin/bash
-
-mkdir -p images/code-in-postgres
-cat /home/fozz/Projects/lnug-code-in-postgres/_src/code-in-postgres/in-order-by-limit.erd | erd -f png > images/code-in-postgres/in-order-by-limit.erd.png

@@ -23,9 +23,11 @@
   "homepage": "https://github.com/forbesmyester/lnug-code-in-postgresql#readme",
   "dependencies": {
     "glob": "^7.1.3",
-    "handlebars": "^4.0.12",
+    "handlebars": "^4.1.0",
     "pg": "^7.5.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "javascript-typescript-langserver": "^2.11.2"
+  },
   "description": ""
 }

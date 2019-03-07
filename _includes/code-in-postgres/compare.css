@@ -1,9 +1,3 @@
-.wrapper { max-width: none; }
-div.post-content { display: flex; flex-wrap: wrap; }
-section.results { box-sizing: border-box; width: 100%; }
-section.code-compare { margin-left: auto; margin-right: auto; box-sizing: border-box; width: 50%; padding-left: 30px; }
-section.code-compare.first { padding-left: 0; }
-
 section.con ul li, section.pro ul li { list-style: none; }
 section.con ul li::before, section.pro ul li::before { padding-right: 1.1225em; position: relative; top: 0em; }
 section.pro ul li::before { color: green;  content: "✔"; }
@@ -15,6 +9,15 @@ section.con ul li::before { color: red; content: "✘"; }
 .sql-splitting-image.open h4::before { content: " ▿ "; }
 .sql-splitting-image.open figure { display: block; }
 
+/*
+.wrapper { max-width: none; }
+div.post-content { display: flex; flex-wrap: wrap; }
+section.results { box-sizing: border-box; width: 100%; }
+section.code-compare { margin-left: auto; margin-right: auto; box-sizing: border-box; width: 50%; padding-left: 30px; }
+section.code-compare.first { padding-left: 0; }
+
+
+
 figure pre { margin: 0; padding: 0; border: 0; }
 figure pre * { margin: 0; padding: 0; border: 0; }
 figure pre code td:first-child { padding-right: 0.5rem; text-align: right; }
@@ -24,3 +27,4 @@ figure pre code td:first-child pre {
   border-right: solid #777;
 }
 figure pre code table { margin-bottom: 0 }
+*/

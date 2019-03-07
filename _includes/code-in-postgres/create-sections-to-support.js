@@ -1,28 +1,17 @@
 function headingToCssDefaultCssClass(s) {
-    return s.toLowerCase().replace(/[^a-z0-9]/,'-');
+    return s.toLowerCase().replace(/[^a-z0-9]/g,'-');
 }
 
 process(
     document.querySelector('div.post-content'),
     2,
-    function(s) {
-        if (['js', 'sql'].indexOf(s.toLowerCase()) > -1) {
-            return [
-                'tabbable',
-                'code-compare',
-                'code-compare-' + headingToCssDefaultCssClass(s),
-                headingToCssDefaultCssClass(s),
-                'pro-con-holder'
-            ];
-        }
-        return ['tabbable', headingToCssDefaultCssClass(s)];
-    }
+    function(s) { return ['section', headingToCssDefaultCssClass(s)]; }
 );
 
-Array.from(document.querySelectorAll('div.post-content section.pro-con-holder')).forEach(
-    function(proConHolder) {
+Array.from(document.querySelectorAll('div.post-content section')).forEach(
+    function(section) {
         process(
-            proConHolder,
+            section,
             3,
             function(s) {
                 let r = [headingToCssDefaultCssClass(s)];
@@ -39,8 +28,8 @@ Array.from(document.querySelectorAll('div.post-content section.pro-con-holder'))
 );
 
 
-Array.from(document.querySelectorAll('div.post-content section.code-compare section.libraries')).forEach(
-    function(proConHolder) {
+Array.from(document.querySelectorAll('div.post-content section section.libraries')).forEach(
+    function(section) {
 
         function grabFnWithoutExt(s) {
             return s.replace(/.*\//, '')
@@ -50,7 +39,7 @@ Array.from(document.querySelectorAll('div.post-content section.code-compare sect
         }
 
         process(
-            proConHolder,
+            section,
             4,
             function(s) {
                 let r = [
@@ -82,4 +71,4 @@ function bindOpenToggle(h4) {
     );
 }
 
-Array.from(document.querySelectorAll('div.post-content section.code-compare section.libraries h4')).map(bindOpenToggle);
+Array.from(document.querySelectorAll('div.post-content section section.libraries h4')).map(bindOpenToggle);

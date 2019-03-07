@@ -12,13 +12,27 @@ DIRNAME=$(dirname $0)
 
 $DIRNAME/get-postgres-result $SQL_FILE > "$SQL_TMP"
 node "$JS_FILE" | jq -c -S . > "$JS_TMP"
+
+function finish {
+  rm "$JS_TMP" "$SQL_TMP"
+}
+trap finish EXIT
+
 set +e
-diff "$JS_TMP" "$SQL_TMP"
+DIFF=$(diff "$JS_TMP" "$SQL_TMP")
 E=$?
 set -e
 if [ $E -ne 0 ]; then
     echo "Difference detected..."
-    echo "Files: $JS_TMP $SQL_TMP"
+    echo ""
+    echo "${JS_FILE}: "
+    cat "$JS_TMP" | sed 's/^/  /'
+    echo ""
+    echo "${SQL_FILE}: "
+    cat "$SQL_TMP" | sed 's/^/  /'
+    echo ""
+    echo "Diff: "
+    echo "${DIFF}" | sed 's/^/  /'
 fi
 exit $E
 

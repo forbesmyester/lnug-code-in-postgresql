@@ -6,9 +6,6 @@
  */
 function limit(n) {
     return function(rows) {
-        if (rows.length < n) {
-            throw new Error("limit(): Wanted to get ${n} rows, but less rows found");
-        }
         return rows.slice(0, n);
     }
 }

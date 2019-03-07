@@ -1,33 +1,19 @@
+/**
+ * Creates a `sortFn` for the JavaScript [Array.prototype.sort](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort) function.
+ *
+ * @param columnName string The name of the column to sort by.
+ * @param direction string If this is 'ASC' sort ascending, otherwise descending.
+ * @return (a: number, b: number) => number The `sortFn`.
+ */
 function getSingleCompareFunction(columnName, direction) {
+
+    const flipper = direction.toLowerCase() == 'asc' ? 1 : -1;
+
     return function singleCompareFunction(rowA, rowB) {
-        flipper = direction.toLowerCase() == 'asc' ? 1 : -1;
         return (rowA[columnName] - rowB[columnName]) * flipper;
     }
 }
 
-
-/**
- * Orders a set of rows
- *
- * @param colDirectionTuples [c: string, d: string][] Ordering specification where `c` is line `columnName` and `d` is like `direction` from `orderBy`
- * @param rows Row[]
- * @return Row[]
- */
-function orderByMulti(colDirectionTuples) {
-
-    function compareFunction(rowA, rowB) {
-        return colDirectionTuples.reduce((acc, [col, dir]) => {
-            if (acc != 0) { return acc; }
-            const cf = getSingleCompareFunction(col, dir);
-            return cf(rowA, rowB);
-        }, 0);
-    }
-
-    return function(rows) {
-        return rows.sort(compareFunction);
-    }
-
-}
 
 /**
  * Orders a set of rows
@@ -39,9 +25,7 @@ function orderByMulti(colDirectionTuples) {
  */
 function orderBy(columnName, direction='ASC') {
 
-    if (columnName instanceof Array) { return orderByMulti(columnName); }
-
-    let compareFunction = getSingleCompareFunction(columnName, direction);
+    const compareFunction = getSingleCompareFunction(columnName, direction);
 
     return function(rows) {
         return rows.sort(compareFunction);
@@ -49,4 +33,5 @@ function orderBy(columnName, direction='ASC') {
 }
 
 
+orderBy.getSingleCompareFunction = getSingleCompareFunction;
 module.exports = orderBy;
