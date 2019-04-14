@@ -110,6 +110,7 @@ Lastly `LIMIT` controls how many items to return. It can also be combined with `
 ### Con's
 
  * Is the `order by` / `limit 1` a trick?
+ * It seems in code you can give the contents of IN clause a name (`raceIds`) but this is not possible using SQL's `IN`, [or is it?]({{ site.baseurl }}{% post_url 2019-03-12-code-in-postgres-with %}).
 
 
 ## Results
