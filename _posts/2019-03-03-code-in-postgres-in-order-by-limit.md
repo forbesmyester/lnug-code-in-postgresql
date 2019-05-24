@@ -22,14 +22,20 @@ Lets say you want to find out who the Formula 1 World Champion was in 2017. The 
 
 An example of the data you would find in these tables is shown below:
 
-#### drivers
+#### races
 
-| driverId | driverRef | number | code | forename | surname  |    dob     | nationality |                     url                      |
-|----------+-----------+--------+------+----------+----------+------------+-------------+----------------------------------------------|
-|        1 | hamilton  |     44 | HAM  | Lewis    | Hamilton | 1985-01-07 | British     | http://en.wikipedia.org/wiki/Lewis_Hamilton |
-|        2 | heidfeld  |        | HEI  | Nick     | Heidfeld | 1977-05-10 | German      | http://en.wikipedia.org/wiki/Nick_Heidfeld |
-|        3 | rosberg   |      6 | ROS  | Nico     | Rosberg  | 1985-06-27 | German      | http://en.wikipedia.org/wiki/Nico_Rosberg |
-|        4 | alonso    |     14 | ALO  | Fernando | Alonso   | 1981-07-29 | Spanish     | http://en.wikipedia.org/wiki/Fernando_Alonso |
+| raceId | year | round | circuitId |           name           |    date    |   time   |                             url                             |
+|--------+------+-------+-----------+--------------------------+------------+----------+-------------------------------------------------------------|
+|    969 | 2017 |     1 |         1 | Australian Grand Prix    | 2017-03-26 | 05:00:00 | https://en.wikipedia.org/wiki/2017_Australian_Grand_Prix|
+|    970 | 2017 |     2 |        17 | Chinese Grand Prix       | 2017-04-09 | 06:00:00 | https://en.wikipedia.org/wiki/2017_Chinese_Grand_Prix|
+|    971 | 2017 |     3 |         3 | Bahrain Grand Prix       | 2017-04-16 | 15:00:00 | https://en.wikipedia.org/wiki/2017_Bahrain_Grand_Prix|
+|    972 | 2017 |     4 |        71 | Russian Grand Prix       | 2017-04-30 | 12:00:00 | https://en.wikipedia.org/wiki/2017_Russian_Grand_Prix|
+|    973 | 2017 |     5 |         4 | Spanish Grand Prix       | 2017-05-14 | 12:00:00 | https://en.wikipedia.org/wiki/2017_Spanish_Grand_Prix|
+|    974 | 2017 |     6 |         6 | Monaco Grand Prix        | 2017-05-28 | 12:00:00 | https://en.wikipedia.org/wiki/2017_Monaco_Grand_Prix|
+|    975 | 2017 |     7 |         7 | Canadian Grand Prix      | 2017-06-11 | 18:00:00 | https://en.wikipedia.org/wiki/2017_Canadian_Grand_Prix|
+|    976 | 2017 |     8 |        73 | Azerbaijan Grand Prix    | 2017-06-25 | 13:00:00 | https://en.wikipedia.org/wiki/2017_Azerbaijan_Grand_Prix|
+|    977 | 2017 |     9 |        70 | Austrian Grand Prix      | 2017-07-09 | 12:00:00 | https://en.wikipedia.org/wiki/2017_Austrian_Grand_Prix|
+
 
 #### driversStandings
 

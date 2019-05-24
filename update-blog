@@ -1,5 +1,7 @@
 #!/bin/bash
 
+find images | grep '\.erd$' | parallel cat {} '|' erd '>' {}.png
+
 killall jekyll
 jekyll clean
 jekyll build
