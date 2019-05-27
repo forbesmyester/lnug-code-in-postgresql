@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Code In PostgreSQL: Inner Join"
+title:  "Code In PostgreSQL: Combining data from multiple tables with INNER JOIN"
 date:   2019-05-14 07:00:20
 categories: postgresql code-in-postgres
 ---
@@ -67,7 +67,6 @@ Where <i>forename</i> and <i>surname</i> have the real values in.
 |        3 | rosberg   |      6 | ROS  | Nico     | Rosberg  | 1985-06-27 | German      | http://en.wikipedia.org/wiki/Nico_Rosberg |
 |        4 | alonso    |     14 | ALO  | Fernando | Alonso   | 1981-07-29 | Spanish     | http://en.wikipedia.org/wiki/Fernando_Alonso |
 
-
 ### The SQL
 
 {% highlight sql %}
@@ -76,5 +75,36 @@ Where <i>forename</i> and <i>surname</i> have the real values in.
 
 ### The aim
 
-We would like to give a name to the section of code within the `IN (...)` clause.
+We have the following data from the [previous article]({{ site.baseurl }}{% post_url 2019-03-12-code-in-postgres-with %}).
+
+{% include code-in-postgres/bin/in-order-by-limit.result.html %}
+
+We would like to mix this result with data from the `drivers` table above so we might get a result similar to:
+
+TODO: ADD DATA HERE
+
+### The plan
+
+There are two things we're missing to implement this in JavaScript. These are:
+
+ 1. The ability to find a row in the `drivers` table that matches a row in our current result set.
+ 2. The ability to mix this row from `drivers` with our current results.
+
+Because this is an open source blog about open source tools I'm going to allow myself the freedom to over-engineer this and consider that we are going to be looking up thousands of `drivers` from a list of millions of `driverId`. How would we solve this problem?
+
+Well the obvious answer to finding a `driver` from a list of `drivers` would be to use `find`... something lie the following?
+
+{% highlight js %}
+{% include code-in-postgres/array-find.js %}
+{% endhighlight %}
+
+This is certainly a reusable piece of code and was easy to write, but how will it perform? When we need to look up a `driverId` we need to scan all the rows in `drivers` up until the point we find the correct one and do this for all the (millions of) `driverId` we want to look up. So I'm pretty sure the performance characteristics of this is not great.
+
+The following would perform much better:
+
+{% highlight js %}
+{% include code-in-postgres/sql-spitting-image/_indexBySimple.js %}
+{% endhighlight %}
+
+This code will scan through the whole set of `drivers` only once and fill up a Map (returned by `indexBySimple`) so that the key is the `driverId` and the values are the actual rows that match (though it will really just point to the Array so will use up little memory).
 

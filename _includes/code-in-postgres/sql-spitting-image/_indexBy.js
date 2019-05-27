@@ -8,7 +8,7 @@ function generateIndexByKey(columnNames, row) {
 }
 /**
  * Given an array or Row, looks at the data and indexes them by a specific
- * columnName so you can find a Row quickly without having to `.find()` it.
+ * columnNames so you can find a Row quickly without having to `.find()` it.
  *
  * @param columnNames string[]|string
  * @param results Row[]
@@ -17,12 +17,12 @@ function generateIndexByKey(columnNames, row) {
 function indexBy(columnNames, results) {
     return results.reduce((acc, row) => {
         let k = generateIndexByKey(columnNames, row);
-        if (!acc.hasOwnProperty(k)) {
-            acc[k] = [];
+        if (!acc.has(k)) {
+            acc.set(k, []);
         }
-        acc[k].push(row);
+        acc.get(k).push(row);
         return acc;
-    }, {});
+    }, new Map());
 }
 
 

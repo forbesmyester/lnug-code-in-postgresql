@@ -15,10 +15,9 @@ This is the first of the [Code In Postgres](/code-in-postgres/) series of articl
 
 ## The aim
 
-Lets say you want to find out who the Formula 1 World Champion was in 2017. The schema for the tables we will be using is as follows:
+Lets say you want to find out the final points for drivers in the 2017 Formula 1 World Championship. The schema for the tables we will be using is as follows:
 
 ![ERD Diagram](/images/2019-03-03-code-in-postgres-in-order-by-limit.erd.png)
-
 
 An example of the data you would find in these tables is shown below:
 
@@ -47,12 +46,13 @@ An example of the data you would find in these tables is shown below:
 |             64805 |    856 |        2 |     34 |       10 | 10           |    0 |
 |             64810 |    856 |        3 |     67 |        7 | 7            |    0 |
 
-The `driverStandings` table has the points for every driver in every race and world champions would be the driver with the most points in a single season. The problem here is that there is no record in the `driverStandings` table for which season a `raceId` belongs to. So we need to get a bit creative... Here is one possible solution:
+The `driverStandings` table has the points for every driver in every race. The problem here is that there is no record in the `driverStandings` table for which season a `raceId` belongs to. So we need to get a bit creative... Here is one possible solution:
 
  1. Looking at the `races` table's `year` column, we can find all the `raceId` in 2017.
- 2. Find the `points` and `driverId` for all of those `raceId` by reading the `driverStandings` table.
+ 2. If we can get all `races` in a given `year` we should be able to get the last race because the `raceId` will be the highest within that year.
+ 2. Find the `points` and `driverId` for the drivers who were in that `raceId` by reading the `driverStandings` table.
  3. Sort them by `points` descending.
- 4. The very first row contains the `driverId` which has the most points in that season. This `driverId` is the world champion.
+ 4. The very first row contains the `driverId` which has the most points in that season. This `driverId` is the world champion. The ones later on denote their final position (assuming the points differ).
 
 ## Implementing the JavaScript
 
@@ -80,7 +80,9 @@ In this JavaScript example we will assume the writer has sufficient SQL knowledg
 {% include code-in-postgres/in-order-by-limit.js %}
 {% endhighlight %}
 
-This code, despite there being a lot of it is relatively straight forward. We get a list of `raceId` from the `qryRaces` function and pass this to the `qryStandings` function. The `qryStandings` function fans out a series of [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) and collates them back again returning the standings of all drivers after all races in 2017, which is quite a lot of unnecessary data. Once we have all this data we then use a series of (included) library functions to sort the data by points and take the first result.
+This code, despite there being a lot of it is relatively straight forward. We get a list of `raceId` from the `qryRaces` function. Once we have this we will order by the `raceId` from largest to smallest and take the one off the top. This is the last race.
+
+After this we feed the `raceId` of the last race in 2017 directly into the `qryStandings` functions to get the results from the last race. Finally we sort by the `points` column, from largest to smallest, solely for presentation reasons.
 
 ### Pro's
 
@@ -91,7 +93,6 @@ This code, despite there being a lot of it is relatively straight forward. We ge
 
  * Longer than SQL
  * We downloaded a reasonably large amount of data from the database, which could be slow.
- * There are some non trivial constructs here such as flattening Arrays and using Promise.all to wait for a series of Promises.
 
 ## SQL
 
@@ -99,13 +100,13 @@ This code, despite there being a lot of it is relatively straight forward. We ge
 {% include code-in-postgres/in-order-by-limit.sql %}
 {% endhighlight %}
 
+Like the JavaScript we are using ordering (`ORDER BY`) and limiting (`LIMIT`) to get the highest `raceId` within 2017.
+
 The `IN` clause can be used to match a column against a set of numbers. For example we may choose to write `WHERE "raceId" IN (4, 5, 7)` which would be the same thing as writing `WHERE "raceId" = 4 OR "raceId" = 5 OR "raceId" = 7`.
 
-The smart thing here is that we are using a query to return the numbers for the `IN` clause instead of a directly specified list.
+The smart thing here is that we are using a query to get the last `raceId` within the `IN` clause instead of a directly specified list of `raceId`.
 
-`ORDER BY` statements are used to perform sorting of the record set, you can sort by multiple fields or use many types of expressions.
-
-Lastly `LIMIT` controls how many items to return. It can also be combined with `OFFSET` to skip rows.
+Finally an `ORDER BY` statement is used to perform sorting of the final record set, you can sort by multiple fields or use many types of expressions.
 
 ### Pro's
 

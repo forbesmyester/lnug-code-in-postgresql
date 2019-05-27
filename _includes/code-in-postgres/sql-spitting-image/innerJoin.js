@@ -26,13 +26,8 @@ function innerJoin(colOrColsA, resultsA, colOrColsB, resultsB) {
 
     function joinRows(otherRows) {
         return function(row) {
-            let rowKeys = Object.keys(row);
             return otherRows.map(otherRow => {
-                let result = {...otherRow};
-                rowKeys.map(rk => {
-                    result[rk] = row[rk];
-                });
-                return result;
+                return {...otherRow, ...row};
             });
         }
     }
@@ -40,15 +35,15 @@ function innerJoin(colOrColsA, resultsA, colOrColsB, resultsB) {
     const indexedResultsA = indexBy(colOrColsA, resultsA);
     const indexedResultsB = indexBy(colOrColsB, resultsB);
 
-    return Object.keys(indexedResultsA).reduce(
+    return Array.from(indexedResultsA.keys()).reduce(
         (acc, key) => {
-            if (!indexedResultsB.hasOwnProperty(key)) {
+            if (!indexedResultsB.has(key)) {
                 return acc;
             }
             return acc.concat(
                 flattenOne(
-                    indexedResultsA[key].map(
-                        joinRows(indexedResultsB[key])
+                    indexedResultsA.get(key).map(
+                        joinRows(indexedResultsB.get(key))
                     )
                 )
             );
@@ -67,7 +62,6 @@ assert.deepEqual(
     ),
     []
 );
-
 
 // Has Results
 assert.deepEqual(

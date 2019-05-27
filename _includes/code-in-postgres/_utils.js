@@ -63,12 +63,26 @@ function assoc(k, v, ob) {
  * Takes an Array of Array and converts it into just an Array by removing one
  * level of nesting.
  *
- * @param Array<Array<T>>
+ * @param rowOfRows Array<Array<T>>
  * @return Array<T>
  */
 function flatten(rowOfRows) {
     return rowOfRows.reduce((acc, rows) => acc.concat(rows), []);
 }
 
+/**
+ * Takes an Array of anythign and returns the very first item, if there are zero
+ * items it will throw an Error
+ *
+ * @param ar Array<T>
+ * @return T
+ */
+function takeOne(ar) {
+    if (!ar.length) {
+        throw new Error("Was expecting an array of more than one element but got ${ar}");
+    }
+    return ar[0];
+}
 
-module.exports = { assoc, flatten, output, runQuery };
+
+module.exports = { assoc, flatten, output, runQuery, takeOne };

@@ -23,32 +23,29 @@ function qryRaces(year) {
 /**
  * Gets all driver standings at a given set of raceIds
  *
- * @param raceIds number[]
+ * @param raceId number
  * @return Promise<MainResult[]>
  */
-function qryStandings(raceIds) {
+function qryStandings(raceId) {
 
-    const promises = raceIds.map((raceId) => {
-        const sql = `
-            select
-            "driverStandings".points,
-            "driverStandings"."driverId",
-            2017 as year
-            from "driverStandings"
-            where "raceId" = $1
-            `;
-        return runQuery(sql, [raceId]);
-    });
+    const sql = `
+        select
+        "driverStandings".points,
+        "driverStandings"."driverId",
+        2017 as year
+        from "driverStandings"
+        where "raceId" = $1
+        `;
+    return runQuery(sql, [raceId]);
 
-    return Promise.all(promises).then(flatten);
 }
 
 
 qryRaces(2017)
-    .then(racesResults => {
-        return qryStandings(racesResults.map(({raceId}) => raceId));
-    })
-    .then(orderBy('points', 'desc'))
+    .then(orderBy('raceId', 'desc'))
     .then(limit(1))
+    .then(takeOne)
+    .then(qryStandings)
+    .then(orderBy('points', 'desc'))
     .then(output)
     .catch(err => { console.log("ERROR:", err) });

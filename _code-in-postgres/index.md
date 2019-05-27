@@ -15,6 +15,7 @@ categories: code-in-postgres
 
   * [You can do lots with just IN, ORDER BY and LIMIT]({{ site.baseurl }}{% post_url 2019-03-03-code-in-postgres-in-order-by-limit %})
   * [You can use WITH to name specific parts of SQL]({{ site.baseurl }}{% post_url 2019-03-12-code-in-postgres-with %})
+  * [Combining data from multiple tables with INNER JOIN]({{ site.baseurl }}{% post_url 2019-05-15-code-in-postgres-inner-join %})
 
 More to come...
 

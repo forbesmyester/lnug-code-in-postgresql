@@ -1,6 +1,6 @@
 #!/bin/bash
 
-find images | grep '\.erd$' | parallel cat {} '|' erd '>' {}.png
+find images | grep '\.erd$' | parallel cat {} '|' erd -f png '>' {}.png
 
 killall jekyll
 jekyll clean
