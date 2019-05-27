@@ -1,12 +1,6 @@
 const assert = require("assert");
 
 
-const drivers = [
-    { driverId: 2, forename: "Lewis", surname: "Hamilton" },
-    { driverId: 14, forename: "Fernando", surname: "Alonso" }
-];
-
-
 /**
  * Given an array or Row, index them using a specific column so you can find a
  * Row quickly without having to `.find()` it.
@@ -31,7 +25,13 @@ function indexBySimple(columnName, rows) {
 
 
 assert.equal(
-    indexBySimple("driverId", drivers).get(14)[0].forename,
+    indexBySimple(
+        "driverId",
+        [
+            { driverId: 2, forename: "Lewis", surname: "Hamilton" },
+            { driverId: 14, forename: "Fernando", surname: "Alonso" }
+        ]
+    ).get(14)[0].forename,
     "Fernando"
 );
 

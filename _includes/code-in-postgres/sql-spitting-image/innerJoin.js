@@ -1,5 +1,4 @@
-const indexBy = require('./_indexBy');
-let assert = require('assert');
+const { indexBy, generateIndexByKey } = require('./_indexBy');
 
 
 /**
@@ -14,71 +13,24 @@ let assert = require('assert');
  */
 function innerJoin(colOrColsA, resultsA, colOrColsB, resultsB) {
 
-    function flattenOne(arr) {
-        let r = [];
-        arr.forEach(ar => {
-            ar.forEach(a => {
-                r.push(a);
-            })
+    function joinRows(row, otherRows) {
+        return otherRows.map(otherRow => {
+            return {...otherRow, ...row};
         });
-        return r;
     }
 
-    function joinRows(otherRows) {
-        return function(row) {
-            return otherRows.map(otherRow => {
-                return {...otherRow, ...row};
-            });
-        }
-    }
-
-    const indexedResultsA = indexBy(colOrColsA, resultsA);
     const indexedResultsB = indexBy(colOrColsB, resultsB);
 
-    return Array.from(indexedResultsA.keys()).reduce(
-        (acc, key) => {
-            if (!indexedResultsB.has(key)) {
-                return acc;
-            }
-            return acc.concat(
-                flattenOne(
-                    indexedResultsA.get(key).map(
-                        joinRows(indexedResultsB.get(key))
-                    )
-                )
+    let results = [];
+    for (let rowA of resultsA) {
+        let searchKey = generateIndexByKey(colOrColsA, rowA);
+        if (indexedResultsB.has(searchKey)) {
+            results = results.concat(
+                joinRows(rowA, indexedResultsB.get(searchKey))
             );
-        },
-        []
-    )
+        }
+    }
+    return results;
 }
-
-// No results when nothing matches
-assert.deepEqual(
-    innerJoin(
-        'id',
-        [{ id: "x", name: "Jack"}],
-        "driverId",
-        [{driverId: "y", race: "Silverstone 1981 GP"}]
-    ),
-    []
-);
-
-// Has Results
-assert.deepEqual(
-    innerJoin(
-        'id',
-        [{ id: "x", name: "Jack"}, { id: "y", name: "Sterling"}],
-        'driverId',
-        [
-            {driverId: "y", race: "Silverstone 1981 GP"},
-            {driverId: "y", race: "Spa GP 1982"}
-        ]
-    ),
-    [
-        {driverId: "y", race: "Silverstone 1981 GP", id: "y", name: "Sterling"},
-        {driverId: "y", race: "Spa GP 1982", id: "y", name: "Sterling"}
-    ]
-);
-
 
 module.exports = innerJoin;

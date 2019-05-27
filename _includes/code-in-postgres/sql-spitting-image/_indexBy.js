@@ -1,3 +1,6 @@
+/**
+ * TODO: Docs
+ */
 function generateIndexByKey(columnNames, row) {
     if (columnNames instanceof Array) {
         return JSON.stringify(
@@ -6,6 +9,8 @@ function generateIndexByKey(columnNames, row) {
     }
     return row[columnNames];
 }
+
+
 /**
  * Given an array or Row, looks at the data and indexes them by a specific
  * columnNames so you can find a Row quickly without having to `.find()` it.
@@ -26,4 +31,4 @@ function indexBy(columnNames, results) {
 }
 
 
-module.exports = indexBy;
+module.exports = { indexBy, generateIndexByKey };

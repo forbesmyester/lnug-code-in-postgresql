@@ -21,10 +21,7 @@ function arrayFind(column, value, rows) {
 }
 
 
-assert.equal(
-    arrayFind("driverId", 14, drivers).forename,
-    "Fernando"
-);
+assert.equal(arrayFind("driverId", 14, drivers).forename, "Fernando");
 
 
 module.exports = arrayFind;

@@ -92,10 +92,12 @@ There are two things we're missing to implement this in JavaScript. These are:
 
 Because this is an open source blog about open source tools I'm going to allow myself the freedom to over-engineer this and consider that we are going to be looking up thousands of `drivers` from a list of millions of `driverId`. How would we solve this problem?
 
+#### Finding drivers efficiently
+
 Well the obvious answer to finding a `driver` from a list of `drivers` would be to use `find`... something lie the following?
 
 {% highlight js %}
-{% include code-in-postgres/array-find.js %}
+{% include code-in-postgres/arrayFind.js %}
 {% endhighlight %}
 
 This is certainly a reusable piece of code and was easy to write, but how will it perform? When we need to look up a `driverId` we need to scan all the rows in `drivers` up until the point we find the correct one and do this for all the (millions of) `driverId` we want to look up. So I'm pretty sure the performance characteristics of this is not great.
@@ -106,5 +108,34 @@ The following would perform much better:
 {% include code-in-postgres/sql-spitting-image/_indexBySimple.js %}
 {% endhighlight %}
 
-This code will scan through the whole set of `drivers` only once and fill up a Map (returned by `indexBySimple`) so that the key is the `driverId` and the values are the actual rows that match (though it will really just point to the Array so will use up little memory).
+This code will scan through the whole set of `drivers` only once and fill up a Map (returned by `indexBySimple`) so that the key is the `driverId` and the values are the actual rows that match (though it will really just point to the Array so will use up little memory).  Once we have the Map looking up drivers by `driverId` will become very cheap.
+
+#### Mixing a `drivers` record with our current results
+
+Combining an Object of one type (`drivers`) with another (`currentResults`) is really easy in ES6 because you can simply destruct the objects to create new one like the following
+
+```js
+    const newObject = {...currentResults, ...driverRow};
+```
+
+### Building the libraries
+
+#### sql-spitting-image/_indexBy.js
+
+In this implementation of the above it has been exteneded to allow for returned Map to be multiple columns. This will help us later on in blog series.
+
+{% highlight js %}
+{% include code-in-postgres/sql-spitting-image/_indexBy.js %}
+{% endhighlight %}
+
+#### sql-spitting-image/innerJoin.js
+
+If we think about joining rows a bit more and are willing to spend the time to make a generic implementation we realise that there are a series of columns in one data set which match up to a series of columns in another data set.
+
+The below function takes two sets of rows along with two sets of column names. The column names are used to generate values from the rows which will be matched against the values from the other rows columns.
+
+{% highlight js %}
+{% include code-in-postgres/sql-spitting-image/innerJoin.js %}
+{% endhighlight %}
+
 
