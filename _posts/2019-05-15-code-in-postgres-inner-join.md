@@ -120,9 +120,11 @@ Combining an Object of one type (`drivers`) with another (`currentResults`) is r
 
 ### Building the libraries
 
-#### sql-spitting-image/_indexBy.js
+If we think about joining rows a bit more and are willing to spend the time to make a generic implementation we realise that there are a series of columns in one data set which match up to a series of columns in another data set.
 
-In this implementation of the above it has been exteneded to allow for returned Map to be multiple columns. This will help us later on in blog series.
+This means that our simple implementation in `code-in-postgres/sql-spitting-image/_indexBySimple.js` needs to be extended to also allow the keys of the Map to include multiple columns. This is shown below along with the implementation for joining the tables by multiple columns.
+
+#### sql-spitting-image/_indexBy.js
 
 {% highlight js %}
 {% include code-in-postgres/sql-spitting-image/_indexBy.js %}
@@ -130,12 +132,12 @@ In this implementation of the above it has been exteneded to allow for returned 
 
 #### sql-spitting-image/innerJoin.js
 
-If we think about joining rows a bit more and are willing to spend the time to make a generic implementation we realise that there are a series of columns in one data set which match up to a series of columns in another data set.
-
-The below function takes two sets of rows along with two sets of column names. The column names are used to generate values from the rows which will be matched against the values from the other rows columns.
-
 {% highlight js %}
 {% include code-in-postgres/sql-spitting-image/innerJoin.js %}
 {% endhighlight %}
 
+## Main Code
 
+{% highlight js %}
+{% include code-in-postgres/inner-join.js %}
+{% endhighlight %}
