@@ -37,14 +37,7 @@ Where <i>forename</i> and <i>surname</i> have the real values in.
 
 | raceId | year | round | circuitId |           name           |    date    |   time   |                             url                             |
 |--------+------+-------+-----------+--------------------------+------------+----------+-------------------------------------------------------------|
-|    969 | 2017 |     1 |         1 | Australian Grand Prix    | 2017-03-26 | 05:00:00 | https://en.wikipedia.org/wiki/2017_Australian_Grand_Prix|
-|    970 | 2017 |     2 |        17 | Chinese Grand Prix       | 2017-04-09 | 06:00:00 | https://en.wikipedia.org/wiki/2017_Chinese_Grand_Prix|
 |    971 | 2017 |     3 |         3 | Bahrain Grand Prix       | 2017-04-16 | 15:00:00 | https://en.wikipedia.org/wiki/2017_Bahrain_Grand_Prix|
-|    972 | 2017 |     4 |        71 | Russian Grand Prix       | 2017-04-30 | 12:00:00 | https://en.wikipedia.org/wiki/2017_Russian_Grand_Prix|
-|    973 | 2017 |     5 |         4 | Spanish Grand Prix       | 2017-05-14 | 12:00:00 | https://en.wikipedia.org/wiki/2017_Spanish_Grand_Prix|
-|    974 | 2017 |     6 |         6 | Monaco Grand Prix        | 2017-05-28 | 12:00:00 | https://en.wikipedia.org/wiki/2017_Monaco_Grand_Prix|
-|    975 | 2017 |     7 |         7 | Canadian Grand Prix      | 2017-06-11 | 18:00:00 | https://en.wikipedia.org/wiki/2017_Canadian_Grand_Prix|
-|    976 | 2017 |     8 |        73 | Azerbaijan Grand Prix    | 2017-06-25 | 13:00:00 | https://en.wikipedia.org/wiki/2017_Azerbaijan_Grand_Prix|
 |    977 | 2017 |     9 |        70 | Austrian Grand Prix      | 2017-07-09 | 12:00:00 | https://en.wikipedia.org/wiki/2017_Austrian_Grand_Prix|
 
 
@@ -52,67 +45,53 @@ Where <i>forename</i> and <i>surname</i> have the real values in.
 
 | driverStandingsId | raceId | driverId | points | position | positionText | wins |
 |-------------------+--------+----------+--------+----------+--------------+------ |
-|             64782 |    855 |        3 |     63 |        7 | 7            |    0 |
 |             64795 |    856 |        1 |    196 |        5 | 5            |    2 |
-|             64797 |    856 |        4 |    212 |        3 | 3            |    1 |
-|             64805 |    856 |        2 |     34 |       10 | 10           |    0 |
 |             64810 |    856 |        3 |     67 |        7 | 7            |    0 |
 
 ##### drivers
 
 | driverId | driverRef | number | code | forename | surname  |    dob     | nationality |                     url                      |
 |----------+-----------+--------+------+----------+----------+------------+-------------+----------------------------------------------|
-|        1 | hamilton  |     44 | HAM  | Lewis    | Hamilton | 1985-01-07 | British     | http://en.wikipedia.org/wiki/Lewis_Hamilton |
 |        2 | heidfeld  |        | HEI  | Nick     | Heidfeld | 1977-05-10 | German      | http://en.wikipedia.org/wiki/Nick_Heidfeld |
-|        3 | rosberg   |      6 | ROS  | Nico     | Rosberg  | 1985-06-27 | German      | http://en.wikipedia.org/wiki/Nico_Rosberg |
 |        4 | alonso    |     14 | ALO  | Fernando | Alonso   | 1981-07-29 | Spanish     | http://en.wikipedia.org/wiki/Fernando_Alonso |
 
-### The SQL
+### Implementing the JavaScript
 
-{% highlight sql %}
-{% include code-in-postgres/inner-join.sql %}
-{% endhighlight %}
-
-### The aim
-
-We have the following data from the [previous article]({{ site.baseurl }}{% post_url 2019-03-12-code-in-postgres-with %}).
-
-{% include code-in-postgres/bin/in-order-by-limit.result.html %}
-
-We would like to mix this result with data from the `drivers` table above so we might get a result similar to:
-
-TODO: ADD DATA HERE
-
-### The plan
-
-There are two things we're missing to implement this in JavaScript. These are:
+If we think about what code we had in the previous article there are two peices of functionality  we're missing. These are:
 
  1. The ability to find a row in the `drivers` table that matches a row in our current result set.
- 2. The ability to mix this row from `drivers` with our current results.
+ 2. The ability to mix/join this row from `drivers` with our current results.
 
-Because this is an open source blog about open source tools I'm going to allow myself the freedom to over-engineer this and consider that we are going to be looking up thousands of `drivers` from a list of millions of `driverId`. How would we solve this problem?
+I'm going to aim to write code that is highly reusable and also still performs well on very large data sets.
 
 #### Finding drivers efficiently
 
-Well the obvious answer to finding a `driver` from a list of `drivers` would be to use `find`... something lie the following?
+The obvious answer to finding a `driver` from a list of `drivers` would be to use `Array.find()`... something lie the following?
 
 {% highlight js %}
 {% include code-in-postgres/arrayFind.js %}
 {% endhighlight %}
 
-This is certainly a reusable piece of code and was easy to write, but how will it perform? When we need to look up a `driverId` we need to scan all the rows in `drivers` up until the point we find the correct one and do this for all the (millions of) `driverId` we want to look up. So I'm pretty sure the performance characteristics of this is not great.
+This is certainly a reusable piece of code and was easy to write and hopefully for you to understand.
 
-The following would perform much better:
+I can see two problems here though.
 
+The first problem is performance. When we need to look up a `driverId` we need to scan all the rows in `drivers` up until the point we find the correct one. We will be doing this for all of the (hypothetically millions of) `driverId` we want to look up. So I'm pretty sure the performance characteristics of this is not great.
+
+The other short coming I can see is that it will only ever retreive one row. This is often what we want to acheive, but not always. An example of when this is not enough is when you have one customerId and you want to find / match / join it to all orders in another table.
+
+The following would perform much better and allow returning multiple rows:
+
+#### sql-spitting-image/_indexBySimple.js
 {% highlight js %}
 {% include code-in-postgres/sql-spitting-image/_indexBySimple.js %}
 {% endhighlight %}
 
-This code will scan through the whole set of `drivers` only once and fill up a Map (returned by `indexBySimple`) so that the key is the `driverId` and the values are the actual rows that match (though it will really just point to the Array so will use up little memory).  Once we have the Map looking up drivers by `driverId` will become very cheap.
+The `indexBySimple` function can scan through the whole set of `drivers` and fill up a Map with the key being `driverId` and the values are the actual rows with have that `driverId`.  Once we have this Map looking up drivers by `driverId` will become very cheap.
 
 #### Mixing a `drivers` record with our current results
 
-Combining an Object of one type (`drivers`) with another (`currentResults`) is really easy in ES6 because you can simply destruct the objects to create new one like the following
+Combining an Object of one type (`driverRow`) with another (`currentResults`) is really easy in ES6 because you can simply destruct the objects to create new one like the following
 
 ```js
     const newObject = {...currentResults, ...driverRow};
@@ -120,24 +99,95 @@ Combining an Object of one type (`drivers`) with another (`currentResults`) is r
 
 ### Building the libraries
 
-If we think about joining rows a bit more and are willing to spend the time to make a generic implementation we realise that there are a series of columns in one data set which match up to a series of columns in another data set.
+#### sql-spitting-image/innerJoinSimple.js
 
-This means that our simple implementation in `code-in-postgres/sql-spitting-image/_indexBySimple.js` needs to be extended to also allow the keys of the Map to include multiple columns. This is shown below along with the implementation for joining the tables by multiple columns.
-
-#### sql-spitting-image/_indexBy.js
+Because of all our planning the innerJoinSimple library has become really quite simple.
 
 {% highlight js %}
-{% include code-in-postgres/sql-spitting-image/_indexBy.js %}
+{% include code-in-postgres/sql-spitting-image/innerJoinSimple.js %}
 {% endhighlight %}
 
-#### sql-spitting-image/innerJoin.js
+Reading through it you can see that the first thing it does is build an index for the right set of data.
+
+After this it will read through all of the left set of data, checking if it can be joined to the right, if it can it will be.
+
+### Libraries
+
+#### sql-spitting-image/select.js
 
 {% highlight js %}
-{% include code-in-postgres/sql-spitting-image/innerJoin.js %}
+{% include code-in-postgres/sql-spitting-image/select.js %}
 {% endhighlight %}
 
-## Main Code
+#### sql-spitting-image/orderBy.js
+
+{% highlight js %}
+{% include code-in-postgres/sql-spitting-image/orderBy.js %}
+{% endhighlight %}
+
+#### sql-spitting-image/orderByMulti.js
+
+{% highlight js %}
+{% include code-in-postgres/sql-spitting-image/orderByMulti.js %}
+{% endhighlight %}
+
+#### sql-spitting-image/limit.js
+
+{% highlight js %}
+{% include code-in-postgres/sql-spitting-image/limit.js %}
+{% endhighlight %}
+
+#### sql-spitting-image/qryTable.js
+
+{% highlight js %}
+{% include code-in-postgres/sql-spitting-image/qryTable.js %}
+{% endhighlight %}
+
+
+### Main Code
+
+The last thing to do is glue all the code together. See below:
 
 {% highlight js %}
 {% include code-in-postgres/inner-join.js %}
 {% endhighlight %}
+
+Again we have a rather large amount of code, however I again think it is quite readable.
+
+Even if you disagree and don't like this code I hope you will agree that this amount of code could easily be wrote quite badly.
+
+### Pro's
+
+ * Broken down quite well into bite size peices.
+ * A lot of this code is quite reusable, if you wish.
+
+### Con's
+
+ * There's a lot of it.
+ * We are again requesting more data than is required.
+
+### The SQL
+
+{% highlight sql %}
+{% include code-in-postgres/inner-join.sql %}
+{% endhighlight %}
+
+### Pro's
+
+ * Shorter than the JavaScript.
+ * If this were called by JavaScript we would need only one Promise, which is much easier to write and reason about.
+ * The `INNER JOIN` relatively effortlessly mixes in data about drivers into what we had before.
+
+### Con's
+
+ * There's not much here that's re-usable, other than the knowledge you've acquired.
+
+<script>
+(function() {
+    {% include jekyll-create-sections-from-headers.js %}
+    {% include code-in-postgres/create-sections-to-support.js %}
+}())
+</script>
+<style>
+    {% include code-in-postgres/compare.css %}
+</style>

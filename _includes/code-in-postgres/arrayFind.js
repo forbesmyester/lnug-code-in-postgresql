@@ -10,9 +10,10 @@ const drivers = [
 /**
  * Find one `row` within rows that has `value` within the specified `column`.
  *
- * @param rows Row[] An array of objects to represent rows.
  * @param column string The property within the rows to look within.
  * @param value number|string The value that column (above) should be.
+ * @param rows Row[] An array of objects to represent rows.
+ * @return Row
  */
 function arrayFind(column, value, rows) {
     return rows.find((row) => {

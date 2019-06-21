@@ -1,6 +1,6 @@
 WITH "racesIn2017" as (
     SELECT "raceId" FROM races WHERE year = 2017
-    ORDER BY "raceId" DESC
+    ORDER BY "round" DESC
     LIMIT 1
 )
 SELECT

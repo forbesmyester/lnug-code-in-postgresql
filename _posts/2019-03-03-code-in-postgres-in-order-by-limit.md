@@ -21,6 +21,10 @@ Lets say you want to find out the final points for drivers in the 2017 Formula 1
 
 An example of the data you would find in these tables is shown below:
 
+## Assumed level of SQL Knowledge
+
+In this JavaScript example we will assume the writer has sufficient SQL knowledge to use a `WHERE` statement along with the ability to only return certain fields using `SELECT`. After this we will see how this can be accomplished in one single SQL statement using `IN`, `ORDER BY` and `LIMIT`.
+
 #### races
 
 | raceId | year | round | circuitId |           name           |    date    |   time   |                             url                             |
@@ -49,16 +53,12 @@ An example of the data you would find in these tables is shown below:
 The `driverStandings` table has the points for every driver in every race. The problem here is that there is no record in the `driverStandings` table for which season a `raceId` belongs to. So we need to get a bit creative... Here is one possible solution:
 
  1. Looking at the `races` table's `year` column, we can find all the `raceId` in 2017.
- 2. If we can get all `races` in a given `year` we should be able to get the last race because the `raceId` will be the highest within that year.
+ 2. If we can get all `races` in a given `year` we should be able to get the last race because the `round` will be the highest within that year.
  2. Find the `points` and `driverId` for the drivers who were in that `raceId` by reading the `driverStandings` table.
  3. Sort them by `points` descending.
  4. The very first row contains the `driverId` which has the most points in that season. This `driverId` is the world champion. The ones later on denote their final position (assuming the points differ).
 
 ## Implementing the JavaScript
-
-### Assumed level of SQL Knowledge for the JavaScript example
-
-In this JavaScript example we will assume the writer has sufficient SQL knowledge to use a `WHERE` statement along with the ability to only return certain fields using `SELECT`. After this we will see how this can be accomplished in one single SQL statement using `IN`, `ORDER BY` and `LIMIT`.
 
 ### Libraries
 
@@ -68,10 +68,22 @@ In this JavaScript example we will assume the writer has sufficient SQL knowledg
 {% include code-in-postgres/sql-spitting-image/limit.js %}
 {% endhighlight %}
 
+#### sql-spitting-image/select.js
+
+{% highlight js %}
+{% include code-in-postgres/sql-spitting-image/select.js %}
+{% endhighlight %}
+
 #### sql-spitting-image/orderBy.js
 
 {% highlight js %}
 {% include code-in-postgres/sql-spitting-image/orderBy.js %}
+{% endhighlight %}
+
+#### sql-spitting-image/orderByMulti.js
+
+{% highlight js %}
+{% include code-in-postgres/sql-spitting-image/orderByMulti.js %}
 {% endhighlight %}
 
 ### Main Code
@@ -80,9 +92,9 @@ In this JavaScript example we will assume the writer has sufficient SQL knowledg
 {% include code-in-postgres/in-order-by-limit.js %}
 {% endhighlight %}
 
-This code, despite there being a lot of it is relatively straight forward. We get a list of `raceId` from the `qryRaces` function. Once we have this we will order by the `raceId` from largest to smallest and take the one off the top. This is the last race.
+This code, despite there being a lot of it is relatively straight forward. We get a list of `raceId` and `round` from the `qryRaces` function. Once we have this we will order by the `round` from largest to smallest and take the first one. This is the last race of the season.
 
-After this we feed the `raceId` of the last race in 2017 directly into the `qryStandings` functions to get the results from the last race. Finally we sort by the `points` column, from largest to smallest, solely for presentation reasons.
+After this we feed that `raceId` directly into the `qryStandings` functions to get the results from the last race. Finally we are forced to use a more complicated sorting function for stability, because some drivers have the same amount of points before presenting our desired columns.
 
 ### Pro's
 
@@ -92,7 +104,7 @@ After this we feed the `raceId` of the last race in 2017 directly into the `qryS
 ### Con's
 
  * Longer than SQL
- * We downloaded a reasonably large amount of data from the database, which could be slow.
+ * We downloaded more data than necessary, in this case it is not too bad but it could have been much worse.
 
 ## SQL
 
@@ -116,7 +128,7 @@ Finally an `ORDER BY` statement is used to perform sorting of the final record s
 
 ### Con's
 
- * Is the `order by` / `limit 1` a trick?
+ * Is the `ORDER BY` / `LIMIT 1` a trick?
  * It seems in code you can give the contents of IN clause a name (`raceIds`) but this is not possible using SQL's `IN`, [or is it?]({{ site.baseurl }}{% post_url 2019-03-12-code-in-postgres-with %}).
 
 

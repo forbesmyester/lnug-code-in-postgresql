@@ -1,10 +1,12 @@
-const { flatten, runQuery, output } = require('./_utils');
+const { takeOne, runQuery, output } = require('./_utils');
 const limit = require('./sql-spitting-image/limit');
+const select = require('./sql-spitting-image/select');
 const orderBy = require('./sql-spitting-image/orderBy');
+const orderByMulti = require('./sql-spitting-image/orderByMulti');
 
 
 /**
- * interface RaceResult { round: number; }
+ * interface RaceResult { round: number; raceId: number; }
  * interface MainResult { points: number; driverId: number; year: number; }
  */
 
@@ -16,7 +18,7 @@ const orderBy = require('./sql-spitting-image/orderBy');
  * @return Promise<RaceResult[]>
  */
 function qryRaces(year) {
-    return runQuery('select "raceId" from races where year = $1', [year]);
+    return runQuery('select "round", "raceId" from races where year = $1', [year]);
 }
 
 
@@ -42,10 +44,19 @@ function qryStandings(raceId) {
 
 
 qryRaces(2017)
-    .then(orderBy('raceId', 'desc'))
+    .then(orderBy('round', 'desc'))
     .then(limit(1))
+    .then((rounds) => rounds.map(r => r.raceId))
     .then(takeOne)
     .then(qryStandings)
-    .then(orderBy('points', 'desc'))
+    .then(orderByMulti([['points', 'desc'], ['driverId', 'asc']]))
+    .then(select([
+        ["points", "points"],
+        ["driverId", "driverId"],
+        ["year" , "year"]
+    ]))
     .then(output)
-    .catch(err => { console.log("ERROR:", err) });
+    .catch(err => {
+        console.log("ERROR:", err);
+        process.exit(1);
+    });

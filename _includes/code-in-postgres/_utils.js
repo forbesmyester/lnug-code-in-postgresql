@@ -41,7 +41,7 @@ function output(rows) {
         .map(JSON.stringify)
         .join("\n");
     console.log(r);
-    return r;
+    return rows;
 }
 
 
