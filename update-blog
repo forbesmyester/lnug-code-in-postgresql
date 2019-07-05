@@ -11,23 +11,15 @@ _includes/code-in-postgres/compare-results _includes/code-in-postgres/inner-join
 
 parallel cat {} '|' psql -H '>' _includes/code-in-postgres/bin/{/.}.result.html ::: _includes/code-in-postgres/inner-join.sql _includes/code-in-postgres/in-order-by-limit.sql _includes/code-in-postgres/with.sql
 
-if [ ! -d ../psql-tools ]; then
-    git clone https://github.com/forbesmyester/psql-tools.git ../psql-tools
-fi
+./add-project-readme ./_posts/2019-06-14-hacky-tools-for-postgresql.md ../psql-tools postgresql
 
-echo '---' > ./_posts/2019-06-14-hacky-tools-for-postgresql.md
-echo 'layout: post' >> ./_posts/2019-06-14-hacky-tools-for-postgresql.md
-echo 'title:  "Hacky tools for PostgreSQL"' >> ./_posts/2019-06-14-hacky-tools-for-postgresql.md
-echo 'date:   2019-06-14 12:00:00' >> ./_posts/2019-06-14-hacky-tools-for-postgresql.md
-echo 'categories: postgresql' >> ./_posts/2019-06-14-hacky-tools-for-postgresql.md
-echo '---' >> ./_posts/2019-06-14-hacky-tools-for-postgresql.md
-echo '' >> ./_posts/2019-06-14-hacky-tools-for-postgresql.md
-cat ../psql-tools/README.md | sed 's/^#/##/g' >> ./_posts/2019-06-14-hacky-tools-for-postgresql.md
-echo '' >> ./_posts/2019-06-14-hacky-tools-for-postgresql.md
-echo 'You can get these tools at [GitHub](https://github.com/forbesmyester/psql-tools).' >> ./_posts/2019-06-14-hacky-tools-for-postgresql.md
+./add-project-readme ./_posts/2019-07-05-jdbc-pipe-jdbc-pipe-quick-jdbc-queries-respecting-unix-conventions-environmental-variables-stdin-stdout.md ../jdbc-pipe "postgresql sql jdbc unix stdin stdout"
+
+
 
 killall jekyll || true
 jekyll clean
 jekyll build
 ./update-blog-files > files.tf
 terraform apply -state=_private/terraform.tfstate .
+

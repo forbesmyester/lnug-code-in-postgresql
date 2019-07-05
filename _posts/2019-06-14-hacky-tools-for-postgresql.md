@@ -1,13 +1,14 @@
 ---
 layout: post
-title:  "Hacky tools for PostgreSQL"
+title:  Hacky tools for PostgreSQL
 date:   2019-06-14 12:00:00
 categories: postgresql
 ---
 
-## Hacky tools for PostgreSQL
 
 Hacky tools for PostgreSQL that makes interacting / extracting / analysis of data in PostgreSQL easier.
+
+NOTE: Examples are from a PostgreSQL version of [ergast](https://ergast.com/mrd/).
 
 ### psql-out
 
@@ -47,8 +48,10 @@ echo 'select name, position from competitors' | psql-out -f ndjson
 
 To get an ndjson file out. You can also get a TSV (Tab seperated CSV) out by passing `-t tsv`.
 
-If you however have [termgraph](https://github.com/mkaz/termgraph) installed and in your $PATH you can run probably leave Excel / Tableau / Whatever out of this process entirely and just draw your graphs right in the terminal:
-    
+### termgraph-runner
+
+When you've got your nice CSV using the tools from above and you want to see if the data looks correct quickly one of the best ways I know to do this is to draw a quick graph. You could fire up Excel or [LibreOffice](https://www.libreoffice.org/) and pointy-clicky to get your graph. This is a __really__ bad solution if you're still finding out whether your data is correct because that feedback loop of command-line -> csv -> spreadsheet > graph is pretty long. What if you could quickly draw graphs right in your terminal... You can using termgraph-runner (which is backed by the awesome [termgraph](https://github.com/mkaz/termgraph).
+
 ```shell
 echo '
     select
@@ -58,12 +61,8 @@ echo '
     from results
     natural join drivers
     group by code
-    order by 2 desc limit 5' | psql-out -f graph -- --color {green,red}
+    order by 2 desc limit 5' | psql-out -f csv | termgraph-runner --stacked
 ```
-
-And get the following back
-
-![Result of above command](screenshot.png)
 
 ### pgpass-env
 
@@ -115,4 +114,28 @@ It also adds adds `$DATABASE_URL` which I use in [vim-dadbod](https://github.com
 
 NOTE: Look at the BASH source code, `pgpass-env` is quick, simple code to get the job done, __not__ perfect code. You can see that the .pgpass fields are separated by `:` but I have put no thought in how to escape a `:` should one be included in a password. If your password includes a `:` it'll probably break.
 
-You can get these tools at [GitHub](https://github.com/forbesmyester/psql-tools).
+### Installation
+
+Installation is simple with some BASH tomfoolery:
+
+```shell
+find . -maxdepth 1 -type f -executable | parallel ln -s "$PWD/{/}" ~/.local/bin
+```
+
+### Other interesting tools I've found to do portions of this...
+
+I've not found anything that I can use to draw pie charts simply in the terminal - ideas welcome.
+
+#### Software
+
+ * [graph-cli](https://github.com/mcastorina/graph-cli) Can accept input from STDIN and will pop up your graph in a window.
+ * [Veusz](https://veusz.github.io/) Is a desktop app which looks like a mix of Tableau and a DTP application. It's file format is plain text and it even has a Python API. It should be possible to wrap this and spit out a great image file.
+ * [feedgnuplot](https://github.com/dkogan/feedgnuplot) looks like the thing I'd use if I wanted to draw a line graph. Because it's based on gnuplot it can draw your line graph right in the terminal or can popup a window.
+
+#### Libraries
+
+ * [ggplot](https://github.com/tidyverse/ggplot2) is an R library for drawing graphs, could probably whip something up again to output an image file.
+ * [vega](https://vega.github.io/) and vega-lite are by far the best JavaScript graphing libraries I've ever come across. You can specify a graph using just json and they have a [CLI interface](https://vega.github.io/vega/usage/#cli) that can spit out png's etc.
+
+You can find this project at [GitHub](https://github.com/forbesmyester/psql-tools).
+You can find this project at [GitHub](https://github.com/forbesmyester/jdbc-pipe).

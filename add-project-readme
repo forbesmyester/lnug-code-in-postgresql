@@ -1,0 +1,31 @@
+#!/bin/bash
+
+set -euo pipefail
+IFS=$'\n\t'
+
+OUTFILE=$1
+INDIR="$2"
+INFILE="${INDIR}/README.md"
+CATEGORIES=$3
+
+if [ ! -d "$INDIR" ]; then
+    git clone "git@github.com:forbesmyester/$(basename ${INDIR}).git" "${INDIR}"
+fi
+
+DATE=$(basename "$OUTFILE" | sed 's/\([0-9\-]*\)-.*/\1/')
+TITLE=$(cat "$INFILE" | grep '^# '| sed 's/# \+//')
+
+REPO_NAME=$(git -C "$INDIR" remote -v | sed 'sI.*/II' | sed 'sI (.*II' | sed 's/\.git$//' | head -n1)
+
+echo '---' > "$OUTFILE"
+echo 'layout: post' >> "$OUTFILE"
+echo "title:  $TITLE" >> "$OUTFILE"
+echo "date:   $DATE 12:00:00" >> "$OUTFILE"
+echo "categories: $CATEGORIES" >> "$OUTFILE"
+echo '---' >> "$OUTFILE"
+echo '' >> "$OUTFILE"
+cat "${INFILE}" | grep -v '^# ' | sed 's/^#/##/g' >> "$OUTFILE"
+echo '' >> "$OUTFILE"
+echo "You can find this project at [GitHub](https://github.com/forbesmyester/$REPO_NAME)." >> ./_posts/2019-06-14-hacky-tools-for-postgresql.md
+
+
